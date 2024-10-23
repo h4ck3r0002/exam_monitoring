@@ -1,0 +1,14 @@
+1, Cài đặt Django và các thư viện cần thiết 
+
+# Tạo project Django mới
+django-admin startproject exam_monitoring
+
+# Di chuyển vào thư mục dự án
+cd exam_monitoring
+
+# Tạo ứng dụng cho bài thi trắc nghiệm
+python manage.py startapp quiz
+
+# Cài đặt các thư viện cần thiết
+pip install djangorestframework opencv-python django-cors-headers celery redis
+

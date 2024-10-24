@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -105,7 +106,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+# LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'vi'
 
 TIME_ZONE = 'Asia/Ho_Chi_Minh'
 
@@ -124,6 +126,19 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
+
+JAZZMIN_SETTINGS = {
+    'site_title': 'ExamMonitor',
+    'site_header': "D1019",
+    'site_brand': 'ExamMonitor',
+    'site_logo': './logo.png',
+    'login_logo': './logo_100.png',
+    'login_logo_dark': './logo_100.png',
+    'site_logo_classes': 'img-circle img-thumbnail',
+    'site_icon': './favicon.ico',
+    'welcome_sign': "Welcome to Admin Page",
+    'copyright': 'KTMT02',
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

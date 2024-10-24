@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Kết quả {% endblock title %}
+
+{% block content %}
+
+<h2>Exam Result</h2>
+<p>Exam: {{ result.exam.title }}</p>
+<p>Score: {{ result.score }}</p>
+<ul>
+    {% for detail in result.resultdetail_set.all %}
+        <li>
+            Question: {{ detail.question.question_text }} - Your Answer: {{ detail.answer.answer_text }} - Correct: {{ detail.is_correct }}
+        </li>
+    {% endfor %}
+</ul>
+<a href="{% url 'home' %}">Back to Exams</a>
+
+
+{% endblock content %}

@@ -2,15 +2,17 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout 
 from django.contrib.auth.decorators import login_required 
 from quiz.models.custom_user import CustomUser 
+from quiz.models.quiz import Exam 
 from django.contrib import messages 
 
 
 def index_view(request):
-    return render(request, 'quiz/index.html', status=200)
+    exams = Exam.objects.order_by('-created_at')
+    return render(request, 'quiz/index.html', {'exams': exams}, status=200)
 
 
 def register_view(request):
-    if request.is_authenticated:
+    if request.user.is_authenticated:
         return redirect('index')
     
     if request.method == 'POST':
@@ -40,7 +42,7 @@ def register_view(request):
 
 
 def login_view(request):
-    if request.is_authenticated:
+    if request.user.is_authenticated:
         return redirect('index')
     
     if request.method == 'POST':

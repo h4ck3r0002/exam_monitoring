@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} {{exam.title}} {% endblock title %}
+
+{% block content %}
+
+<h2>{{ exam.title }}</h2>
+<form method="post">
+    {% csrf_token %}
+    {% for question in exam.question_set.all %}
+        <div>
+            <p>{{ question.question_text }}</p>
+            {% for answer in question.answer_set.all %}
+                <input type="radio" name="question_{{ question.id }}" value="{{ answer.id }}">
+                {{ answer.answer_text }}
+            {% endfor %}
+        </div>
+    {% endfor %}
+    <button type="submit">Submit Exam</button>
+</form>
+
+
+{% endblock content %}

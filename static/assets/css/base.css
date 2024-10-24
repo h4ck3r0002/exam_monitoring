@@ -1,0 +1,17 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.log-reg-section {
+    flex: 1;
+    padding: 36px 40px;
+    max-width: 470px;
+    margin: 0 auto;
+    border: 1px solid #ddd;
+}
+
+.log-reg-section form, p {
+    width: 100%;
+}

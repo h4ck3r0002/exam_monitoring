@@ -11,39 +11,41 @@ def exam_view(request, pk):
         exam = Exam.objects.get(pk=pk)
     except Exam.DoesNotExist:
         return Http404()
-
-    # print(exam.questions.all())
-
-    questions = Question.objects.filter(exam=exam)
     
-    # # AI Generation 
-    # if request.method == 'POST':
-    #     score = 0
-    #     for question in exam.questions.all():
-    #         selected_answer_id = request.POST.get(f'question_{question.id}')
-    #         if selected_answer_id:
-    #             selected_answer = Answer.objects.get(id=selected_answer_id)
-    #             result_detail = ResultDetail(
-    #                 result=None,  # Tạm thời, sẽ cập nhật sau
-    #                 question=question,
-    #                 answer=selected_answer,
-    #                 is_correct=selected_answer.is_correct
-    #             )
-    #             if selected_answer.is_correct:
-    #                 score += 1
-    #     result = Result.objects.create(
-    #         user=request.user,
-    #         exam=exam,
-    #         score=score
-    #     )
-    #     for detail in ResultDetail.objects.filter(result=None):
-    #         detail.result = result
-    #         detail.save()
-    #     return redirect('result', result_id=result.id)
-    # # AI Generation
+    if request.method == 'POST':
+        print(request.POST)
+        score = 0
+        result = Result.objects.create(
+            exam=exam,
+            user=request.user,
+            score=score
+        )
+        for q in exam.question_set.all():
+            selected_answer_id = request.POST.get(f'question_{q.id}')
+            if selected_answer_id and selected_answer_id != "":
+                selected_answer = Answer.objects.get(id=selected_answer_id)
+                result_detail = ResultDetail.objects.create(
+                    result=result,
+                    question=q,
+                    answer=selected_answer,
+                    is_correct=selected_answer.is_correct,
+                )
+                if selected_answer.is_correct:
+                    score += 10 
+            else:
+                ResultDetail.objects.create(
+                    result=result,
+                    question=q,
+                    answer=None,  
+                    is_correct=False, 
+                )
+
+        result.score = score 
+        result.save()
+        return redirect('result', pk=result.id)
 
 
-    return render(request, 'quiz/exam.html', {'exam': exam, 'questions': questions}, status=200)
+    return render(request, 'quiz/exam.html', {'exam': exam}, status=200)
 
 
 @login_required(login_url='/login/')

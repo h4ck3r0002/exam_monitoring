@@ -114,7 +114,7 @@ class ResultDetail(CommonAbstract):
     
 
     def save(self, *args, **kwargs):
-        if self.answer.is_correct:
+        if self.answer and self.answer.is_correct:
             self.is_correct = True 
         super(ResultDetail, self).save(*args, **kwargs)
 

@@ -18,7 +18,6 @@
           <li class="nav-item">
             <a class="nav-link" href="#">Giới thiệu</a>
           </li>
-          
         </ul>
         {% if request.user.is_authenticated %}
           <span class="text-white" style="margin-right: 8px;">{{request.user.username}}</span>
@@ -30,9 +29,24 @@
     </div>
 </nav>
 
-<div class="container">
+<div class="container p-3 row" style="margin: 0 auto;">
   {% for exam in exams %}
-    <a href="{% url 'exam' exam.id %}">{{exam.title}}</a>
+    <a class="card mb-3 col-6 nav-link p-3" href="{% url 'exam' exam.id %}">
+      <div class="">
+        <div class="row g-0">
+          <div class="col-md-4">
+            <img src="{% static 'assets/images/laboratory.png' %}" class="img-fluid rounded-start" alt="{{exam.title}}">
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <h5 class="card-title">{{exam.title}}</h5>
+              <p class="card-text">{{exam.title}} - 15 câu hỏi (có đáp án)</p>
+              <p class="card-text"><small class="text-body-secondary">Ngày tạo: {{exam.created_at|date:"d/m/Y"}}</small></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </a>
   {% endfor %}
 </div>
 

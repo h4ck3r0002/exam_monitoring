@@ -4,20 +4,44 @@
 
 {% block content %}
 
-<h2>{{ exam.title }}</h2>
-<form method="post">
-    {% csrf_token %}
-    {% for question in exam.question_set.all %}
-        <div>
-            <p>{{ question.question_text }}</p>
-            {% for answer in question.answer_set.all %}
-                <input type="radio" name="question_{{ question.id }}" value="{{ answer.id }}">
-                {{ answer.answer_text }}
-            {% endfor %}
-        </div>
-    {% endfor %}
-    <button type="submit">Submit Exam</button>
-</form>
+<div class="container p-3">
+    <div class="">
+        <h2>{{ exam.title }}</h2>
+        <form method="post" action="{% url 'exam' exam.id %}">
+            {% csrf_token %}
+            <div class="slider">
+                {% for question in exam.question_set.all %}
+                    <div class="slide">
+                        <p>Câu hỏi: {{ question.question_text }}</p>
+
+                        <input type="hidden" name="question_{{ question.id }}" value="">
+                        {% for answer in question.answer_set.all %}
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio" name="question_{{ question.id }}" value="{{ answer.id }}">
+                                <label class="form-check-label">
+                                    {{ answer.answer_text }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <div class="controls">
+                <button type="button" class="btn btn-dark" onclick="prevSlide()">
+                    Prev
+                </button>
+                <button type="button" class="btn btn-primary" onclick="nextSlide()">
+                    Next
+                </button>
+                <button class="btn btn-success" type="submit">Nộp bài</button>
+            </div>
+        </form>
+    </div>
+    
+
+</div>
+
 
 
 {% endblock content %}

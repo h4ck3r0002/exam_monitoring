@@ -2,7 +2,7 @@ from django.contrib import admin
 from quiz.models.custom_user import * 
 from quiz.models.quiz import * 
 from django.contrib.auth.admin import UserAdmin 
-import nested_admin
+# import nested_admin
 
 
 @admin.register(CustomUser)
@@ -17,21 +17,21 @@ class CustomUserAdmin(UserAdmin):
     )
 
 
-class AnswerInline(nested_admin.NestedTabularInline):
-    model = Answer 
-    extra = 4 
+# class AnswerInline(nested_admin.NestedTabularInline):
+#     model = Answer 
+#     extra = 4 
 
 
-class QuestionInline(nested_admin.NestedTabularInline):
-    model = Question 
-    extra = 1
-    inlines = [AnswerInline]
+# class QuestionInline(nested_admin.NestedTabularInline):
+#     model = Question 
+#     extra = 1
+#     inlines = [AnswerInline]
 
 
-@admin.register(Exam)
-class ExamAdmin(nested_admin.NestedModelAdmin):
-    inlines = [QuestionInline]
-    list_display = ('title',)
+# @admin.register(Exam)
+# class ExamAdmin(nested_admin.NestedModelAdmin):
+#     inlines = [QuestionInline]
+#     list_display = ('title',)
 
 
 class ResultDetailInline(admin.TabularInline):

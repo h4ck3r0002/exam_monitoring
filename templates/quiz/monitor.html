@@ -1,0 +1,39 @@
+<!-- <video id="videoElement" autoplay></video>
+
+<script>
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(function(stream) {
+            var video = document.getElementById('videoElement');
+            video.srcObject = stream;
+        })
+        .catch(function(err) {
+            console.log("Something went wrong!", err);
+        });
+</script> -->
+
+
+
+<div id="cameras"></div>
+
+<script>
+    const ws = new WebSocket("ws://127.0.0.1:8000/stream");
+
+    ws.onmessage = (event) => {
+        const message = event.data;
+        if (message === "Cheating detected!") {
+            alert("Gian lận được phát hiện!");
+        }
+    };
+
+    ws.onopen = () => {
+        console.log("Đã kết nối đến WebSocket của camera.");
+    };
+
+    ws.onclose = () => {
+        console.log("Đã đóng kết nối WebSocket.");
+    };
+
+    ws.onerror = (error) => {
+        console.log("Lỗi WebSocket:", error);
+    };
+</script>

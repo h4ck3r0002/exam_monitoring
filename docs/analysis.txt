@@ -80,3 +80,8 @@ Django có thể lưu trữ dữ liệu camera và kết quả phân tích trong
 (ví dụ như PostgreSQL) để giảng viên xem lại sau khi kỳ thi kết thúc.
 
 
+Chạy Celery 
+celery -A exam_monitoring worker --loglevel=info 
+
+
+Chạy server

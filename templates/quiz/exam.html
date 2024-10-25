@@ -39,9 +39,50 @@
         </form>
     </div>
     
+    <video style="position: absolute; top: 50px;right: 100px;width: 200px;height: 200px;" id="videoElement" autoplay muted></video>
 
+    <script>
+        // Yêu cầu quyền truy cập camera
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+                var video = document.getElementById('videoElement');
+                video.srcObject = stream;
+    
+                // Thiết lập WebRTC và gửi video đến server
+                startStreamingToServer(stream);
+            })
+            .catch(function(err) {
+                console.log("Something went wrong!", err);
+            });
+    
+        function startStreamingToServer(stream) {
+            // Thiết lập WebSocket để truyền video đến server
+            const ws = new WebSocket("ws://127.0.0.1:8000/stream");
+    
+            ws.onopen = () => {
+                console.log("WebSocket kết nối thành công!");
+                const mediaRecorder = new MediaRecorder(stream, {
+                    mimeType: 'video/webm;codecs=vp9'
+                });
+    
+                mediaRecorder.ondataavailable = function(event) {
+                    if (event.data.size > 0) {
+                        ws.send(event.data);
+                    }
+                };
+    
+                mediaRecorder.start(100); // Gửi mỗi 100ms
+            };
+    
+            ws.onerror = (error) => {
+                console.log("Lỗi WebSocket:", error);
+            };
+    
+            ws.onclose = () => {
+                console.log("Kết nối WebSocket đã đóng.");
+            };
+        }
+    </script>
 </div>
-
-
 
 {% endblock content %}

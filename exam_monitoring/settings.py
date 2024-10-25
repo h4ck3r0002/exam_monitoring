@@ -36,6 +36,13 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 CSRF_TRUSTED_ORIGINS = ['https://web-production-4f5a7.up.railway.app/', 'web-production-4f5a7.up.railway.app']
 
+# Cors settings 
+CORS_ALLOW_ALL_ORIGINS = True 
+
+# Celery configuration 
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
 
 # Application definition
 

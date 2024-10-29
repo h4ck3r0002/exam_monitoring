@@ -1,5 +1,5 @@
 from django.urls import path 
-from quiz.consumers import VideoStreamConsumer 
+from .consumers import VideoStreamConsumer 
 
 
 websocket_urlpatterns = [

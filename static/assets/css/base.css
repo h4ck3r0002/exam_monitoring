@@ -46,3 +46,11 @@
     margin: 0 10px;
     cursor: pointer;
 }
+
+video {
+    position: absolute;
+    top: 50px;
+    right: 100px;
+    width: 200px;
+    height: 200px;
+}

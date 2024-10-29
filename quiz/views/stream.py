@@ -33,3 +33,43 @@ def monitor_view(request):
     return render(request, 'quiz/monitor.html', status=200)
 
 
+
+
+
+# views.py
+import base64
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+def upload_frame(request):
+    if request.method == 'POST':
+        # Lấy frame từ request và giải mã từ base64
+        data = request.body.decode('utf-8')
+        frame_data = data.split(",")[1]
+        frame = base64.b64decode(frame_data)
+
+        # Xử lý hoặc lưu frame tại đây
+        # Ví dụ: Ghi frame vào file hoặc gửi tiếp đến trang giám sát 
+        # Lưu frame vào file (lưu ý đường dẫn tới thư mục lưu frame)
+        file_path = 'latest_frame.jpg'
+        with default_storage.open(file_path, 'wb') as f:
+            f.write(frame)
+
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'failed'}, status=400)
+
+
+import os
+from django.http import JsonResponse
+from django.core.files.storage import default_storage
+
+def latest_frame(request):
+    # Đọc frame từ file hoặc từ bộ nhớ tạm
+    try:
+        with default_storage.open('latest_frame.jpg', 'rb') as f:
+            frame_data = base64.b64encode(f.read()).decode('utf-8')
+        return JsonResponse({'frame': frame_data})
+    except FileNotFoundError:
+        return JsonResponse({'frame': ''})
+

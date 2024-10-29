@@ -6,6 +6,7 @@
 
 <div class="container p-3">
     <div class="">
+        <input type="hidden" name="exam_id" id="exam_id" value="{{exam.id}}">
         <h2 style="color: #FFBF61;font-size: 28px;">{{ exam.title }}</h2>
         <p>Số lượng câu hỏi: {{counter}}</p>
         <p style="display: flex;align-items: center;justify-content: space-between;"><span style="color: #222;font-weight: 700;font-size: 18px;">Player: {{request.user.username}}</span><span id="countdown" style="display: block;font-size: 18px;font-weight: 700;color: #0D92F4;">15:00</span></p>
@@ -42,7 +43,7 @@
         </form>
     </div>
     
-    <!-- <video style="position: absolute; top: 50px;right: 100px;width: 200px;height: 200px;" id="videoElement" autoplay muted></video> -->
+    <video style="position: absolute; top: 50px;right: 100px;width: 200px;height: 200px;" id="videoElement" autoplay muted></video>
 
     <script>
         // Countdown timer (15 minutes)
@@ -61,50 +62,64 @@
             }
             timeLeft -= 1;
         }, 1000);
-
-        // // Yêu cầu quyền truy cập camera
-        // navigator.mediaDevices.getUserMedia({ video: true })
-        //     .then(function(stream) {
-        //         var video = document.getElementById('videoElement');
-        //         video.srcObject = stream;
-    
-        //         // Thiết lập WebRTC và gửi video đến server
-        //         startStreamingToServer(stream);
-        //     })
-        //     .catch(function(err) {
-        //         console.log("Something went wrong!", err);
-        //     });
     
         
+        let mediaRecorder;
+        let recordedChunks = [];
 
-        // // Gửi frame đến server mỗi 1 giây
-        // function sendFrameToServer(frameData) {
-        //     fetch('/monitoring/upload_frame', {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //         },
-        //         body: JSON.stringify({ frame: frameData }),
-        //     }).catch(error => console.log("Error:", error));
-        // }
+        async function startVideoRecording() {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            const videoElement = document.getElementById('videoElement');
+            videoElement.srcObject = stream;
 
-        // async function startStream() {
-        //     const video = document.createElement('video');
-        //     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        //     video.srcObject = stream;
-        //     video.play();
+            mediaRecorder = new MediaRecorder(stream, {
+                mimeType: 'video/webm;codecs=vp9',
+            });
 
-        //     const canvas = document.createElement('canvas');
-        //     const context = canvas.getContext('2d');
+            // Khi có dữ liệu video mới, thêm vào mảng `recordedChunks`
+            mediaRecorder.ondataavailable = function(event) {
+                if (event.data.size > 0) {
+                    recordedChunks.push(event.data);
+                }
+            };
 
-        //     setInterval(() => {
-        //         context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        //         const frameData = canvas.toDataURL('image/jpeg');
-        //         sendFrameToServer(frameData);
-        //     }, 41); // Gửi mỗi giây một frame
-        // }
+            mediaRecorder.start(); // Bắt đầu ghi
+        }
 
-        // startStream();
+        // Gửi video khi người dùng nhấn submit
+        async function uploadRecordedVideo() {
+            // Dừng ghi và tạo Blob từ các đoạn video đã ghi
+            mediaRecorder.stop();
+            const blob = new Blob(recordedChunks, { type: 'video/webm' });
+
+            // Tạo FormData và thêm video Blob vào
+            const formData = new FormData();
+            formData.append('video_recording', blob, 'recorded_video.webm');
+
+            const examId = document.getElementById('exam_id').value;
+
+            await fetch(`/monitoring/upload_video/${examId}`, {
+                method: 'POST',
+                body: formData,
+            }).then(response => {
+                if (response.ok) {
+                    console.log("Video uploaded successfully");
+                } else {
+                    console.error("Failed to upload video");
+                }
+            });
+        }
+
+        // Khi submit form thì gọi uploadRecordedVideo và gửi form
+        document.querySelector("form").onsubmit = async function(event) {
+            event.preventDefault(); // Ngăn form submit mặc định
+            await uploadRecordedVideo(); // Gửi video lên server
+            this.submit(); // Sau khi gửi xong, submit form
+        };
+
+        startVideoRecording(); // Bắt đầu ghi khi tải trang
+
+
 
     </script>
 </div>

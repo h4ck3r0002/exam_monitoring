@@ -26,28 +26,23 @@ SECRET_KEY = 'django-insecure-61+u#_no#60r^j7mt$x$q$$o-3&s5b67plu+w5u=4u$j53!d56
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = []
 
-ALLOWED_HOSTS = ['https://web-production-4f5a7.up.railway.app/', 'web-production-4f5a7.up.railway.app']
+# ALLOWED_HOSTS = ['https://web-production-4f5a7.up.railway.app/', 'web-production-4f5a7.up.railway.app']
 
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# CSRF_COOKIE_SECURE = True
+# SESSION_COOKIE_SECURE = True
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-CSRF_TRUSTED_ORIGINS = ['https://web-production-4f5a7.up.railway.app/', 'web-production-4f5a7.up.railway.app']
+# CSRF_TRUSTED_ORIGINS = ['https://web-production-4f5a7.up.railway.app/', 'web-production-4f5a7.up.railway.app']
 
 # Cors settings 
 CORS_ALLOW_ALL_ORIGINS = True 
-
-# Celery configuration 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    # 'channels',
     'jazzmin',
     'nested_admin',
     'django.contrib.admin',
@@ -89,37 +84,27 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'exam_monitoring.wsgi.application'
-ASGI_APPLICATION = 'exam_monitoring.asgi.application'
-
-CHANNEL_LAYERS = {
-    'default': {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)]
-        },
-    },
-}
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'HOST': 'autorack.proxy.rlwy.net',
-        'PORT': '30464',
-        'NAME': 'railway',
-        'USER': 'postgres',
-        'PASSWORD': 'SfUXSAtDPJmXYVIBWlVLQvaNsQxiWXNh',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'HOST': 'autorack.proxy.rlwy.net',
+#         'PORT': '30464',
+#         'NAME': 'railway',
+#         'USER': 'postgres',
+#         'PASSWORD': 'SfUXSAtDPJmXYVIBWlVLQvaNsQxiWXNh',
+#     }
+# }
 
 
 # Password validation

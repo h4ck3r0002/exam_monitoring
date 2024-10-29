@@ -1,7 +1,7 @@
 from django.urls import path 
 from quiz.views.index import * 
 from quiz.views.quiz import * 
-from quiz.views.stream import * 
+from quiz.views.monitor import * 
 
 
 urlpatterns = [
@@ -11,7 +11,7 @@ urlpatterns = [
     path('logout/', logout_view, name='logout'),
     path('exam/<pk>', exam_view, name='exam'),
     path('result/<pk>', result_view, name='result'),
-    path('monitor/', monitor_view, name='monitor'),
-    path('monitoring/upload_frame', upload_frame, name='upload'),
-    path('', latest_frame, name='lastest_frame'),
+    path('monitor/', monitor_list_view, name='monitor'),
+    path('monitor/<pk>', monitor_detail_view, name='monitor-detail'),
+    path('monitoring/upload_video/<pk>', upload_video, name='upload-video'),
 ]

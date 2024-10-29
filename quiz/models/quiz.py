@@ -119,3 +119,9 @@ class ResultDetail(CommonAbstract):
         super(ResultDetail, self).save(*args, **kwargs)
 
 
+class Monitor(CommonAbstract):
+    id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    exam = models.ForeignKey(Exam, on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
+    video = models.FileField(null=True, blank=True, upload_to='video/')
+

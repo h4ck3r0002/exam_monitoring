@@ -47,13 +47,13 @@
     cursor: pointer;
 }
 
-video {
+/* video {
     position: absolute;
     top: 50px;
     right: 100px;
     width: 200px;
     height: 200px;
-}
+} */
 
 ul {
     list-style: none;

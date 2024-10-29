@@ -43,3 +43,8 @@ class ResultDetailInline(admin.TabularInline):
 class ResultAdmin(admin.ModelAdmin):
     inlines = [ResultDetailInline]
     search_fields = ['exam',]
+
+
+@admin.register(Monitor)
+class MonitorAdmin(admin.ModelAdmin):
+    search_fields = ['id',]

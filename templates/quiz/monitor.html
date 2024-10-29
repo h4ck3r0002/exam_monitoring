@@ -1,18 +1,14 @@
-<div id="monitoring">
-    <h2>Camera Monitoring</h2>
-    <img id="monitoringFrame" src="" alt="No frame available" style="width: 100%; height: auto;">
-</div>
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Giám sát {% endblock title %}
 
-<script>
-    const monitoringFrame = document.getElementById("monitoringFrame");
-
-    // Cập nhật frame mỗi 1 giây
-    setInterval(() => {
-        fetch('/monitoring/latest_frame')
-            .then(response => response.json())
-            .then(data => {
-                monitoringFrame.src = "data:image/jpeg;base64," + data.frame;
-            })
-            .catch(error => console.log("Error:", error));
-    }, 1000);
-</script>
+{% block content %}
+    <div class="container p-3">
+        <h2 style="color: #222;font-size: 28px;margin-bottom: 20px;">Trang giám sát video các bài thi</h2>
+        {% for exam in exams %}
+        <a class="nav-link text-primary mb-3" href="{% url 'monitor-detail' exam.id %}">
+            Record: {{exam.title}}
+        </a>
+        {% endfor %}
+    </div>
+{% endblock content %}

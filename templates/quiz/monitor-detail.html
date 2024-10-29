@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Record: {{exam.title}} {% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <h2 style="color: #222;font-size: 28px;">Record: {{exam.title}}</h2>
+        <div class="row">
+            {% for m in monitors %}
+            <div class="col-6">
+                <div class="d-flex align-items-start justify-content-start" style="gap: 24px;">
+                    <div style="">
+                        <video style="width: 250px;height: 250px;" src="{{m.video.url}}" autoplay muted></video>
+                    </div>
+                    <div>
+                        <p>User: {{m.user.username}}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock content %}

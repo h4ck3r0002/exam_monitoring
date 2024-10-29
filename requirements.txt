@@ -60,7 +60,6 @@ pypiwin32==223
 python-dateutil==2.9.0.post0
 python-monkey-business==1.1.0
 pyttsx3==2.98
-pywin32==308
 redis==5.2.0
 requests==2.32.3
 requests-oauthlib==2.0.0

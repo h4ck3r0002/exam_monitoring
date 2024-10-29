@@ -3,18 +3,39 @@
 {% block title %} Kết quả {% endblock title %}
 
 {% block content %}
-
 <h2>Exam Result</h2>
 <p>Exam: {{ result.exam.title }}</p>
 <p>Score: {{ result.score }}</p>
 <ul>
     {% for detail in result.resultdetail_set.all %}
         <li>
-            Question: {{ detail.question.question_text }} - Your Answer: {{ detail.answer.answer_text }} - Correct: {{ detail.is_correct }}
+            <strong>Question:</strong> {{ detail.question.question_text }}
+            <ul>
+                {% for answer in detail.question.answer_set.all %}
+                    <li style="
+                        background-color: 
+                        {% if answer == detail.answer and detail.is_correct %}yellow
+                        {% elif answer == detail.answer and not detail.is_correct %}red
+                        {% else %}
+                        {% endif %};
+                        color: #222;
+                        padding: 5px;
+                        margin: 5px 0;
+                    ">
+                        {{ answer.answer_text }}
+                        {% if answer == detail.answer %}
+                            - Your Choice
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+            <p><strong>Correct Answer:</strong> 
+                {% for answer in detail.question.answer_set.all %}
+                    {% if answer.is_correct %}{{ answer.answer_text }}{% endif %}
+                {% endfor %}
+            </p>
         </li>
     {% endfor %}
 </ul>
 <a href="{% url 'index' %}">Back to Exams</a>
-
-
 {% endblock content %}

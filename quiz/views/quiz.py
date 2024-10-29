@@ -9,6 +9,7 @@ from quiz.models.custom_user import CustomUser
 def exam_view(request, pk):
     try:
         exam = Exam.objects.get(pk=pk)
+        counter = len(list(exam.question_set.all()))
     except Exam.DoesNotExist:
         return Http404()
     
@@ -45,7 +46,7 @@ def exam_view(request, pk):
         return redirect('result', pk=result.id)
 
 
-    return render(request, 'quiz/exam.html', {'exam': exam}, status=200)
+    return render(request, 'quiz/exam.html', {'exam': exam, 'counter': counter}, status=200)
 
 
 @login_required(login_url='/login/')

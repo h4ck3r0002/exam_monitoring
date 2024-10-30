@@ -18,6 +18,11 @@
           <li class="nav-item">
             <a class="nav-link" href="#">Giới thiệu</a>
           </li>
+          {% if request.user.is_superuser %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'monitor' %}">Giám sát</a>
+          </li>
+          {% endif %}
         </ul>
         {% if request.user.is_authenticated %}
           <span class="text-white" style="margin-right: 8px;">{{request.user.username}}</span>

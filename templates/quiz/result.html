@@ -8,6 +8,7 @@
     <p>Exam: {{ result.exam.title }}</p>
     <p>User: {{request.user.username}}</p>
     <p>Score: {{ result.score }} </p>
+    <p>Trạng thái gian lận: {% if m.is_cheat %} Có {% else %} Không {% endif %}</p>
     <ul>
         {% for detail in result.resultdetail_set.all %}
             <li>

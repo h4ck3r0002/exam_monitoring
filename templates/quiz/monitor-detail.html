@@ -7,13 +7,14 @@
         <h2 style="color: #222;font-size: 28px;">Record: {{exam.title}}</h2>
         <div class="row">
             {% for m in monitors %}
-            <div class="col-6">
-                <div class="d-flex align-items-start justify-content-start" style="gap: 24px;">
+            <div class="col-6" style="border: 3px solid #ccc;">
+                <div class="d-flex align-items-start justify-content-start" style="gap: 24px;flex-direction: column;">
                     <div style="">
-                        <video style="width: 250px;height: 250px;" src="{{m.video.url}}" autoplay muted></video>
+                        <video style="width: 250px;height: 250px;" src="{{m.video.url}}" controls autoplay muted></video>
                     </div>
                     <div>
                         <p>User: {{m.user.username}}</p>
+                        <p>Trạng thái gian lận: {% if m.is_cheat %} Có {% else %} Không {% endif %}</p>
                     </div>
                 </div>
             </div>

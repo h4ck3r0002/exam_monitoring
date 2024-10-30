@@ -81,6 +81,7 @@ class Result(CommonAbstract):
     user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, verbose_name='Người thực hiện')
     exam = models.ForeignKey(Exam, on_delete=models.SET_NULL, null=True, verbose_name='Bài thi')
     score = models.IntegerField(default=0, verbose_name='Điểm số')
+    is_cheat = models.BooleanField(default=False, verbose_name='Trạng thái gian lận')
     
 
     class Meta:
@@ -124,4 +125,5 @@ class Monitor(CommonAbstract):
     exam = models.ForeignKey(Exam, on_delete=models.SET_NULL, null=True)
     user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
     video = models.FileField(null=True, blank=True, upload_to='video/')
+    is_cheat = models.BooleanField(default=False, verbose_name='Trạng thái gian lận')
 

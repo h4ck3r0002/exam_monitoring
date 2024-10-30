@@ -31,16 +31,16 @@ def upload_video(request, pk):
         monitor.video.save(webm_path, video_file)
         monitor.save()
 
-        webm_full_path = os.path.join(settings.MEDIA_ROOT, 'video', webm_path)
-        mp4_path = webm_full_path.replace('.webm', '.mp4')
-        convert_command = ["ffmpeg", "-i", webm_full_path, "-c:v", "libx264", "-c:a", "aac", "-strict", "experimental", mp4_path]
+        # webm_full_path = os.path.join(settings.MEDIA_ROOT, 'video', webm_path)
+        # mp4_path = webm_full_path.replace('.webm', '.mp4')
+        # convert_command = ["ffmpeg", "-i", webm_full_path, "-c:v", "libx264", "-c:a", "aac", "-strict", "experimental", mp4_path]
 
-        # Thực thi lệnh chuyển đổi
-        subprocess.run(convert_command)
+        # # Thực thi lệnh chuyển đổi
+        # subprocess.run(convert_command)
 
-        # Lưu lại đường dẫn của file mp4
-        monitor.video.name = mp4_path.replace(settings.MEDIA_ROOT + "/", "")  # Cập nhật trường video với file .mp4
-        monitor.save()
+        # # Lưu lại đường dẫn của file mp4
+        # monitor.video.name = mp4_path.replace(settings.MEDIA_ROOT + "/", "")  # Cập nhật trường video với file .mp4
+        # monitor.save()
         
         return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'failed'}, status=400)

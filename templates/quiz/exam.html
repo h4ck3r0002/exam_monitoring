@@ -78,46 +78,47 @@
 
             // Khi có dữ liệu video mới, thêm vào mảng `recordedChunks`
             mediaRecorder.ondataavailable = function(event) {
+                console.log(event.data.size);
+                
                 if (event.data.size > 0) {
                     recordedChunks.push(event.data);
                 }
             };
 
+            // Đặt sự kiện `onstop` để gửi video sau khi ghi xong
+            mediaRecorder.onstop = async function() {
+                const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                const formData = new FormData();
+                formData.append('video_recording', blob, 'recorded_video.webm');
+
+                const examId = document.getElementById('exam_id').value;
+
+                await fetch(`/monitoring/upload_video/${examId}`, {
+                    method: 'POST',
+                    body: formData,
+                }).then(response => {
+                    if (response.ok) {
+                        console.log("Video uploaded successfully");
+                    } else {
+                        console.error("Failed to upload video");
+                    }
+                });
+            };
+
             mediaRecorder.start(); // Bắt đầu ghi
         }
 
-        // Gửi video khi người dùng nhấn submit
-        async function uploadRecordedVideo() {
-            // Dừng ghi và tạo Blob từ các đoạn video đã ghi
-            mediaRecorder.stop();
-            const blob = new Blob(recordedChunks, { type: 'video/webm' });
-
-            // Tạo FormData và thêm video Blob vào
-            const formData = new FormData();
-            formData.append('video_recording', blob, 'recorded_video.webm');
-
-            const examId = document.getElementById('exam_id').value;
-
-            await fetch(`/monitoring/upload_video/${examId}`, {
-                method: 'POST',
-                body: formData,
-            }).then(response => {
-                if (response.ok) {
-                    console.log("Video uploaded successfully");
-                } else {
-                    console.error("Failed to upload video");
-                }
-            });
-        }
-
-        // Khi submit form thì gọi uploadRecordedVideo và gửi form
+        // Khi submit form thì gọi `mediaRecorder.stop()` và chờ `onstop` xử lý tải lên
         document.querySelector("form").onsubmit = async function(event) {
             event.preventDefault(); // Ngăn form submit mặc định
-            await uploadRecordedVideo(); // Gửi video lên server
-            this.submit(); // Sau khi gửi xong, submit form
+            mediaRecorder.stop(); // Kết thúc ghi, onstop sẽ xử lý tải lên
+            setTimeout(() => {
+                this.submit(); // Submit form sau khi tải lên hoàn tất
+            }, 1000); // Đặt độ trễ để đảm bảo việc tải lên hoàn tất
         };
 
         startVideoRecording(); // Bắt đầu ghi khi tải trang
+
 
 
 

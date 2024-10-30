@@ -21,6 +21,11 @@ def upload_video(request, pk):
         video_file = request.FILES['video_recording']
         # file_path = os.path.join('videos', 'recorded_video.webm')
 
+        # Kiểm tra dung lượng của file
+        file_size = video_file.size
+        print(f"Dung lượng của file: {file_size} bytes")
+
+
         user = request.user 
 
         monitor = Monitor(

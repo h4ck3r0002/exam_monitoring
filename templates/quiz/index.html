@@ -55,4 +55,20 @@
   {% endfor %}
 </div>
 
+<style>
+  body {
+    background-color: #f8f8f8;
+  }
+
+  .card {
+    border-radius: 10px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  }
+</style>
+
 {% endblock content %}

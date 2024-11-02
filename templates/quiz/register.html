@@ -5,7 +5,7 @@
 {% block content %}
 
 <div class="wrapper-log-reg d-flex align-items-center justify-content-center" style="height: 100vh;">
-    <div class="log-reg-section d-flex align-items-center justify-content-center flex-column" style="gap: 24px;">
+    <div class="log-reg-section d-flex align-items-center justify-content-center flex-column" style="gap: 24px;border-radius: 6px;">
         <h2>Đăng ký tài khoản</h2>
 
         <form action="{% url 'register' %}" method="POST">
@@ -37,5 +37,10 @@
     </div>
 </div>
 
+<style>
+    body {
+      background-color: #f8f8f8;
+    }
+</style>
 
 {% endblock content %}

@@ -1,14 +1,77 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %} Giám sát {% endblock title %}
+{% block title %}Giám sát{% endblock title %}
 
 {% block content %}
-    <div class="container p-3">
-        <h2 style="color: #222;font-size: 28px;margin-bottom: 20px;">Trang giám sát video các bài thi</h2>
-        {% for exam in exams %}
-        <a class="nav-link text-primary mb-3" href="{% url 'monitor-detail' exam.id %}">
-            Record: {{exam.title}}
-        </a>
-        {% endfor %}
+    <div class="container p-4">
+        <h2 class="text-center" style="color: #333; font-size: 28px; font-weight: bold; margin-bottom: 24px;">
+            Trang giám sát video các bài thi
+        </h2>
+        <div class="text-center mt-4 mb-3">
+            <a href="{% url 'index' %}" class="btn-custom">Trang chủ</a>
+        </div>
+        <div class="row">
+            {% for exam in exams %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-body">
+                            <h5 class="card-title text-dark fw-bold">{{ exam.title }}</h5>
+                            <a class="nav-link text-primary" href="{% url 'monitor-detail' exam.id %}" 
+                               style="font-size: 16px; font-weight: 500; text-decoration: none;">
+                               <i class="bi bi-camera-video-fill"></i> Xem giám sát
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
+
+    <style>
+        body {
+            background-color: #f8f8f8;
+        }
+
+        .card {
+            border-radius: 10px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-title {
+            margin-bottom: 12px;
+        }
+
+        .nav-link.text-primary {
+            color: #007bff;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link.text-primary:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        /* Style for the link */
+        .btn-custom {
+            display: inline-block;
+            font-size: 16px;
+            padding: 10px 20px;
+            color: #fff;
+            background-color: #007bff;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+    </style>
 {% endblock content %}

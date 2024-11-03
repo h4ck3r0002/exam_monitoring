@@ -14,4 +14,6 @@ urlpatterns = [
     path('monitor/', monitor_list_view, name='monitor'),
     path('monitor/<pk>', monitor_detail_view, name='monitor-detail'),
     path('monitoring/upload_video/<pk>', upload_video, name='upload-video'),
+    path('api/check_cheating_status/<int:pk>/', check_done_status, name='check_done_status'),
+
 ]

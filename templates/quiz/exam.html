@@ -15,6 +15,8 @@
             <div class="slider">
                 {% for question in exam.question_set.all %}
                     <div class="slide">
+                        <h3 style="color: #333;font-size: 20px;margin-top: 12px;" class="mb-3">Phần I. Câu hỏi trắc nghiệm (4 đáp án)</h3>
+
                         <p>Câu hỏi: {{ question.question_text }}</p>
 
                         <input type="hidden" name="question_{{ question.id }}" value="">
@@ -26,6 +28,36 @@
                                 </label>
                             </div>
                         {% endfor %}
+                    </div>
+                {% endfor %}
+
+                <!-- Câu hỏi đúng sai -->
+                {% for question in exam.questiontruefalse_set.all %}
+                <div class="slide">
+                    <h3 style="color: #333;font-size: 20px;margin-top: 12px;" class="mb-3">Phần II. Câu hỏi trắc nghiệm đúng sai (2 đáp án)</h3>
+                    <p>Câu hỏi: {{ question.question_text }}</p>
+                    <input type="hidden" name="question_tf_{{ question.id }}" value="">
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="radio" name="question_tf_{{ question.id }}" value="true">
+                        <label class="form-check-label">Đúng</label>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="radio" name="question_tf_{{ question.id }}" value="false">
+                        <label class="form-check-label">Sai</label>
+                    </div>
+                </div>
+                {% endfor %}
+
+                <!-- Câu hỏi điền đáp án -->
+                {% for question in exam.questionfill_set.all %}
+                    <div class="slide">
+                        <h3 style="color: #333;font-size: 20px;margin-top: 12px;" class="mb-3">Phần III. Câu hỏi điền đáp án</h3>
+                        <p>Câu hỏi: {{ question.question_text }}</p>
+                        <input type="hidden" name="question_fill_{{ question.id }}" value="">
+                        <div class="mb-3">
+                            <label class="form-label">Điền vào đáp án</label>
+                            <input class="form-control" type="text" name="question_fill_{{ question.id }}">
+                        </div>
                     </div>
                 {% endfor %}
             </div>

@@ -15,6 +15,8 @@ from quiz.models.quiz import Monitor, Result
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
 def process_video(monitor_id):
+    reason = ''
+    
     # Lấy đối tượng Monitor
     monitor = Monitor.objects.get(id=monitor_id)
     video_path = monitor.video.path
@@ -38,11 +40,13 @@ def process_video(monitor_id):
         # Kiểm tra nếu không có người trong camera
         if len(faces) == 0:
             print("Không có người xuất hiện trong camera.")
+            reason = 'Không có người xuất hiện trong camera.'
             is_cheat = True
             break
         elif len(faces) > 1:
             print("Phát hiện nhiều hơn 1 người trong camera.")
             is_cheat = True
+            reason = 'Phát hiện nhiều hơn 1 người trong camera.'
             break
         else:
             # Theo dõi vị trí đầu
@@ -60,16 +64,22 @@ def process_video(monitor_id):
                     if face_turn_count > max_face_turns:
                         print("Phát hiện quay đầu nhiều lần.")
                         is_cheat = True
+                        reason = 'Phát hiện quay đầu nhiều lần. (trên 3)'
                         break
 
     camera.release()
 
     # Cập nhật trạng thái gian lận trong cơ sở dữ liệu
     monitor.is_cheat = is_cheat
+    monitor.reason = reason
     monitor.save()
+
+    print(monitor.exam)
+    print(monitor.user)
 
     result = Result.objects.get(exam=monitor.exam, user=monitor.user)
     result.is_cheat = is_cheat
+    result.reason = reason
     result.is_done = True
     result.save()
 

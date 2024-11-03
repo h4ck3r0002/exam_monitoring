@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect 
 from django.contrib.auth.decorators import login_required 
-from django.http import Http404, HttpResponse 
-from quiz.models.quiz import Exam, Question, Answer, Result, ResultDetail
+from django.http import Http404, HttpResponse, JsonResponse 
+from quiz.models.quiz import Exam, Question, Answer, Result, ResultDetail, QuestionTrueFalse, QuestionFill, ResultTrueFalse, ResultFill
 from quiz.models.custom_user import CustomUser 
+from django.views.decorators.http import require_GET, require_POST 
 
 
 @login_required(login_url='/login/')
@@ -21,6 +22,7 @@ def exam_view(request, pk):
             user=request.user,
             score=score
         )
+
         for q in exam.question_set.all():
             selected_answer_id = request.POST.get(f'question_{q.id}')
             if selected_answer_id and selected_answer_id != "":
@@ -41,6 +43,34 @@ def exam_view(request, pk):
                     is_correct=False, 
                 )
 
+        # Xử lý câu hỏi đúng sai
+        for q in exam.questiontruefalse_set.all():
+            selected_answer = request.POST.get(f'question_tf_{q.id}')
+            is_correct = selected_answer == q.answer  # So sánh đáp án người dùng chọn với đáp án đúng
+            ResultTrueFalse.objects.create(
+                result=result,
+                question=q,
+                answer=selected_answer,
+                is_correct=is_correct
+            )
+            if is_correct:
+                score += 10  # Điểm cho câu hỏi đúng sai
+
+        
+        # Xử lý câu hỏi điền đáp án
+        for q in exam.questionfill_set.all():
+            user_answer = request.POST.get(f'question_fill_{q.id}')
+            is_correct = user_answer.strip().lower() == q.answer.strip().lower()  # So sánh không phân biệt hoa thường
+            ResultFill.objects.create(
+                result=result,
+                question=q,
+                answer=user_answer,
+                is_correct=is_correct
+            )
+            if is_correct:
+                score += 10  # Điểm cho câu hỏi điền đáp án đúng
+
+
         result.score = score 
         result.save()
         return redirect('result', pk=result.id)
@@ -49,11 +79,55 @@ def exam_view(request, pk):
     return render(request, 'quiz/exam.html', {'exam': exam, 'counter': counter}, status=200)
 
 
+# @login_required(login_url='/login/')
+# def result_view(request, pk):
+#     try:
+#         result = Result.objects.get(pk=pk)
+#     except Result.DoesNotExist:
+#         return Http404()
+
+#     return render(request, 'quiz/result.html', {'result': result})
+
+
+
 @login_required(login_url='/login/')
 def result_view(request, pk):
     try:
         result = Result.objects.get(pk=pk)
+        result_details = ResultDetail.objects.filter(result=result)
+        true_false_details = ResultTrueFalse.objects.filter(result=result)
+        fill_details = ResultFill.objects.filter(result=result)
     except Result.DoesNotExist:
-        return Http404()
+        raise Http404()
 
-    return render(request, 'quiz/result.html', {'result': result})
+    return render(request, 'quiz/result.html', {
+        'result': result,
+        'result_details': result_details,
+        'true_false_details': true_false_details,
+        'fill_details': fill_details,
+    })
+
+
+@login_required(login_url='/login/')
+def check_done_status(request, pk):
+    try:
+        result = Result.objects.get(pk=pk)
+    except Result.DoesNotExist:
+        return JsonResponse({
+            'flag': False,
+            'message': 'Not found',
+        }, status=404)
+    
+    if result.is_done:
+        return JsonResponse({
+            'is_cheat': result.is_cheat,
+            'reason': result.reason,
+            'flag': True,
+            'message': 'Oke'
+        }, status=200)
+    else:
+        return JsonResponse({
+            'flag': False,
+            'message': 'Not Found'
+        })
+    

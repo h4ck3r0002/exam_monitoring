@@ -2,8 +2,8 @@ Django, OpenCV
 <br />
 website for monitoring and preventing exam fraud 
 
-subprocess xu ly gian lan khi call 
-cau hoi trac nghiem dang chon dung sai va lua chon 
+subprocess xu ly gian lan khi call (done)
+cau hoi trac nghiem dang chon dung sai va lua chon (done)
 await xu ly o client 
 api check 
 

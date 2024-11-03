@@ -34,6 +34,9 @@ class ExamAdmin(nested_admin.NestedModelAdmin):
     list_display = ('title',)
 
 
+
+
+
 class ResultDetailInline(admin.TabularInline):
     model = ResultDetail 
     extra = 1

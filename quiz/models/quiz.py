@@ -1,6 +1,10 @@
 from django.db import models 
 from .custom_user import CustomUser 
 from django.utils import timezone 
+from django.dispatch import receiver 
+from django.db.models.signals import post_save 
+import os 
+import subprocess 
 
 
 class CommonAbstract(models.Model):
@@ -82,6 +86,7 @@ class Result(CommonAbstract):
     exam = models.ForeignKey(Exam, on_delete=models.SET_NULL, null=True, verbose_name='Bài thi')
     score = models.IntegerField(default=0, verbose_name='Điểm số')
     is_cheat = models.BooleanField(default=False, verbose_name='Trạng thái gian lận')
+    is_done = models.BooleanField(default=False, verbose_name='Kiểm tra gian lận hoàn thành')
     
 
     class Meta:
@@ -124,6 +129,12 @@ class Monitor(CommonAbstract):
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     exam = models.ForeignKey(Exam, on_delete=models.SET_NULL, null=True)
     user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
+    # result = models.ForeignKey(Result, on_delete=models.SET_NULL, null=True, verbose_name='Kết quả')
     video = models.FileField(null=True, blank=True, upload_to='video/')
     is_cheat = models.BooleanField(default=False, verbose_name='Trạng thái gian lận')
 
+
+@receiver(post_save, sender=Monitor)
+def handle_cheat(sender, instance, created, **kwargs):
+    if created:
+        subprocess.Popen(['python', 'handle_cheat.py', str(instance.id)])

@@ -144,27 +144,27 @@ def process_video(monitor_id):
             is_cheat = True
             reason = 'Phát hiện nhiều hơn 1 người trong camera.'
             break
-        else:
-            # Reset no_face_frames vì đã phát hiện thấy khuôn mặt
-            no_face_frames = 0
+        # else:
+        #     # Reset no_face_frames vì đã phát hiện thấy khuôn mặt
+        #     no_face_frames = 0
 
-            # Theo dõi vị trí đầu
-            for (x, y, w, h) in faces:
-                face_center = (x + w // 2, y + h // 2)
-                head_positions.append(face_center)
+        #     # Theo dõi vị trí đầu
+        #     for (x, y, w, h) in faces:
+        #         face_center = (x + w // 2, y + h // 2)
+        #         head_positions.append(face_center)
 
-                # Kiểm tra quay đầu trái/phải
-                if len(head_positions) == 5:
-                    left_right_movements = [head_positions[i][0] - head_positions[i - 1][0] for i in range(1, 5)]
-                    if all(movement > 0 for movement in left_right_movements) or all(movement < 0 for movement in left_right_movements):
-                        face_turn_count += 1
-                        head_positions.clear()
+        #         # Kiểm tra quay đầu trái/phải
+        #         if len(head_positions) == 5:
+        #             left_right_movements = [head_positions[i][0] - head_positions[i - 1][0] for i in range(1, 5)]
+        #             if all(movement > 0 for movement in left_right_movements) or all(movement < 0 for movement in left_right_movements):
+        #                 face_turn_count += 1
+        #                 head_positions.clear()
 
-                    if face_turn_count > max_face_turns:
-                        print("Phát hiện quay đầu nhiều lần.")
-                        is_cheat = True
-                        reason = 'Phát hiện quay đầu nhiều lần. (trên 3)'
-                        break
+        #             if face_turn_count > max_face_turns:
+        #                 print("Phát hiện quay đầu nhiều lần.")
+        #                 is_cheat = True
+        #                 reason = 'Phát hiện quay đầu nhiều lần. (trên 3)'
+        #                 break
 
     camera.release()
 

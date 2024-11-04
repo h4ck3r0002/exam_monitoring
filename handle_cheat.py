@@ -4,18 +4,15 @@ import os
 import django
 import numpy as np
 from django.conf import settings
-from collections import deque 
-import tensorflow as tf
-
+from collections import deque
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'exam_monitoring.settings')
 django.setup()
 
 from quiz.models.quiz import Monitor, Result
 
-# Load the TensorFlow model
-model = tf.keras.models.load_model("model.savedmodel") 
-class_names = open("labels.txt", "r").readlines()
+# Cài đặt bộ phát hiện khuôn mặt của OpenCV
+face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
 def process_video(monitor_id):
     reason = ''
@@ -27,44 +24,50 @@ def process_video(monitor_id):
     # Mở video
     camera = cv2.VideoCapture(video_path)
     is_cheat = False
+    face_turn_count = 0
+    max_face_turns = 3  # Ngưỡng quay đầu
+    head_positions = deque(maxlen=5)  # Lưu các vị trí đầu gần nhất
 
     while camera.isOpened():
         ret, frame = camera.read()
         if not ret:
             break
 
-        # Resize and preprocess frame for the model
-        image = cv2.resize(frame, (224, 224))
-        image = np.asarray(image, dtype=np.float32).reshape(1, 224, 224, 3)
-        image = (image / 127.5) - 1  # Normalize as per model's input requirement
+        # Chuyển ảnh sang xám để phát hiện khuôn mặt
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
 
-        # Predict cheating status using the model
-        prediction = model.predict(image)
+        # Kiểm tra nếu không có người trong camera
+        if len(faces) == 0:
+            print("Không có người xuất hiện trong camera.")
+            reason = 'Không có người xuất hiện trong camera.'
+            is_cheat = True
+            break
+        elif len(faces) > 1:
+            print("Phát hiện nhiều hơn 1 người trong camera.")
+            is_cheat = True
+            reason = 'Phát hiện nhiều hơn 1 người trong camera.'
+            break
+        else:
+            # Theo dõi vị trí đầu
+            for (x, y, w, h) in faces:
+                face_center = (x + w // 2, y + h // 2)
+                head_positions.append(face_center)
 
-        # # Assuming the model outputs a binary classification (0: no cheating, 1: cheating)
-        # if prediction[0][0] > 0.5:  # Adjust threshold if necessary
-        #     print("Cheating detected.")
-        #     is_cheat = True
-        #     reason = 'Detected cheating.'
-        #     break
+                # Kiểm tra quay đầu trái/phải
+                if len(head_positions) == 5:
+                    left_right_movements = [head_positions[i][0] - head_positions[i - 1][0] for i in range(1, 5)]
+                    if all(movement > 0 for movement in left_right_movements) or all(movement < 0 for movement in left_right_movements):
+                        face_turn_count += 1
+                        head_positions.clear()
 
-        # Kiểm tra cấu trúc đầu ra
-        if isinstance(prediction, dict):
-            output_key = list(prediction.keys())[0]  # Lấy tên của tensor đầu ra
-            prediction = prediction[output_key]  # Lấy tensor từ từ điển
-
-        # Tìm lớp dự đoán và điểm số độ tin cậy
-        index = np.argmax(prediction)
-        class_name = class_names[index]
-        confidence_score = prediction[0][index]
-
-        if class_name == 'Cheat':
-            is_cheat = True 
-            reason = 'Detected cheating (Không có mặt trong màn hình, quay trái phải hoặc có nhiều người trong khung hình)'
-            break 
+                    if face_turn_count > max_face_turns:
+                        print("Phát hiện quay đầu nhiều lần.")
+                        is_cheat = True
+                        reason = 'Phát hiện quay đầu nhiều lần. (trên 3)'
+                        break
 
     camera.release()
-
 
     # Cập nhật trạng thái gian lận trong cơ sở dữ liệu
     monitor.is_cheat = is_cheat

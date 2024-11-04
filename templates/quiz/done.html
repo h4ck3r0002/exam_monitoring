@@ -35,26 +35,8 @@
 </nav>
 
 <div class="container p-3 row" style="margin: 0 auto;">
-  {% for exam in exams %}
-    <a class="card mb-3 col-5 nav-link p-3" style="margin-right: 24px;" href="{% url 'exam' exam.id %}">
-      <div class="">
-        <div class="row g-0">
-          <div class="col-md-4">
-            <img src="{% static 'assets/images/laboratory.png' %}" class="img-fluid rounded-start" alt="{{exam.title}}">
-          </div>
-          <div class="col-md-8">
-            <div class="card-body">
-              <h5 class="card-title">{{exam.title}}</h5>
-              <p class="card-text">{{exam.title}} - 15 câu hỏi (có đáp án)</p>
-              <p class="card-text">Thời gian thi: {{exam.time_todo}} phút</p>
-              <p class="card-text">Người tạo: {{exam.created_by}}</p>
-              <p class="card-text"><small class="text-body-secondary">Ngày tạo: {{exam.created_at|date:"d/m/Y"}}</small></p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </a>
-  {% endfor %}
+  <h2 class="text-danger mb-3">Bạn đã hết lượt thực hiện bài thi này!</h2>
+  <a href="/" class="nav-link text-primary">Quay về trang chủ</a>
 </div>
 
 <style>
@@ -63,7 +45,6 @@
   }
 
   .card {
-    border: 3px solid #B9E5E8;
     border-radius: 10px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
@@ -71,28 +52,6 @@
   .card:hover {
     transform: scale(1.05);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  }
-
-  .card-title {
-    color: #2C3E50; /* Màu xanh đậm cho tiêu đề */
-    font-weight: bold;
-  }
-
-  .card-text {
-    color: #34495E; /* Màu xám đậm cho nội dung */
-  }
-
-  .card-text small {
-    color: #7F8C8D; /* Màu xám nhạt cho các thông tin bổ sung */
-  }
-
-  .text-white {
-    color: #ECF0F1; /* Màu trắng cho tên người dùng */
-  }
-
-  .btn-outline-success {
-    color: #28A745; /* Màu xanh lá cây cho nút Đăng nhập/Đăng xuất */
-    border-color: #28A745;
   }
 </style>
 

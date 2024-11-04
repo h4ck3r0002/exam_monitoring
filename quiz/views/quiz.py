@@ -14,6 +14,10 @@ def exam_view(request, pk):
     except Exam.DoesNotExist:
         return Http404()
     
+    user = request.user 
+    if Result.objects.filter(exam=exam, user=user).exists():
+        return render(request, 'quiz/done.html', status=200)
+    
     if request.method == 'POST':
         print(request.POST)
         score = 0

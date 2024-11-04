@@ -26,15 +26,15 @@ SECRET_KEY = 'django-insecure-61+u#_no#60r^j7mt$x$q$$o-3&s5b67plu+w5u=4u$j53!d56
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
 
-# ALLOWED_HOSTS = ['https://web-production-4f5a7.up.railway.app/', 'web-production-4f5a7.up.railway.app', 'https://thitructuyenai.online/', 'thitructuyenai.online']
+ALLOWED_HOSTS = ['https://web-production-4f5a7.up.railway.app/', 'web-production-4f5a7.up.railway.app', 'https://thitructuyenai.online/', 'thitructuyenai.online']
 
-# CSRF_COOKIE_SECURE = True
-# SESSION_COOKIE_SECURE = True
-# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# CSRF_TRUSTED_ORIGINS = ['https://web-production-4f5a7.up.railway.app/', 'web-production-4f5a7.up.railway.app', 'https://thitructuyenai.online/', 'thitructuyenai.online']
+CSRF_TRUSTED_ORIGINS = ['https://web-production-4f5a7.up.railway.app/', 'web-production-4f5a7.up.railway.app', 'https://thitructuyenai.online/', 'thitructuyenai.online']
 
 # Cors settings 
 CORS_ALLOW_ALL_ORIGINS = True 
@@ -88,12 +88,12 @@ WSGI_APPLICATION = 'exam_monitoring.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 # DATABASES = {
 #     'default': {

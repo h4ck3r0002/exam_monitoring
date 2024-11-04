@@ -95,16 +95,16 @@ WSGI_APPLICATION = 'exam_monitoring.wsgi.application'
 #     }
 # }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'HOST': 'autorack.proxy.rlwy.net',
-#         'PORT': '30464',
-#         'NAME': 'railway',
-#         'USER': 'postgres',
-#         'PASSWORD': 'SfUXSAtDPJmXYVIBWlVLQvaNsQxiWXNh',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'HOST': 'autorack.proxy.rlwy.net',
+        'PORT': '30464',
+        'NAME': 'railway',
+        'USER': 'postgres',
+        'PASSWORD': 'SfUXSAtDPJmXYVIBWlVLQvaNsQxiWXNh',
+    }
+}
 
 
 # Password validation

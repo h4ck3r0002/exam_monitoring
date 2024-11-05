@@ -49,7 +49,7 @@
     </ul>
 
     <!-- Phần câu hỏi đúng sai -->
-    <h3 class="text-primary">Phần II. Câu hỏi đúng sai (2 đáp án)</h3>
+    <!-- <h3 class="text-primary">Phần II. Câu hỏi đúng sai (2 đáp án)</h3>
     <ul class="list-unstyled">
         {% for detail in true_false_details %}
             <li class="card mb-4 shadow-sm border-0">
@@ -69,7 +69,43 @@
                 </div>
             </li>
         {% endfor %}
+    </ul> -->
+
+
+    <!-- Phần câu hỏi đúng sai -->
+    <h3 class="text-primary">Phần II. Câu hỏi đúng sai (2 đáp án)</h3>
+    <ul class="list-unstyled">
+        {% for detail in true_false_details %}
+            <li class="card mb-4 shadow-sm border-0">
+                <div class="card-body">
+                    <p class="card-title"><strong>Question:</strong> {{ detail.question.question_text }}</p>
+
+                    <!-- Lặp qua từng mệnh đề trong câu hỏi đúng sai -->
+                    <ul class="list-unstyled">
+                        {% for answer in detail.question.answertruefalse_set.all %}
+                            <li class="d-flex align-items-center mb-2">
+                                <p class="me-3"><strong>Clause:</strong> {{ answer.clause }}</p>
+                                
+                                <!-- Hiển thị đáp án của người dùng -->
+                                <p class="me-3 {% if detail.answer == answer.answer and detail.is_correct %} text-success {% else %} text-danger {% endif %}">
+                                    <strong>Your Answer:</strong> 
+                                    {% if detail.answer == answer.answer %}
+                                        {{ detail.answer|title }}
+                                    {% else %}
+                                        <span class="text-muted">No answer provided</span>
+                                    {% endif %}
+                                </p>
+                                
+                                <!-- Hiển thị đáp án đúng -->
+                                <p><strong>Correct Answer:</strong> <span class="text-success">{{ answer.answer|title }}</span></p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </li>
+        {% endfor %}
     </ul>
+
 
     <!-- Phần câu hỏi điền đáp án -->
     <h3 class="text-primary">Phần III. Câu hỏi điền đáp án</h3>

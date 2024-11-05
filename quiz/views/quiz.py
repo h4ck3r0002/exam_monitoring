@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect 
 from django.contrib.auth.decorators import login_required 
 from django.http import Http404, HttpResponse, JsonResponse 
-from quiz.models.quiz import Exam, Question, Answer, Result, ResultDetail, QuestionTrueFalse, QuestionFill, ResultTrueFalse, ResultFill
+from quiz.models.quiz import Exam, Question, Answer, Result, ResultDetail, QuestionTrueFalse, QuestionFill, ResultTrueFalse, ResultFill, AnswerTrueFalse
 from quiz.models.custom_user import CustomUser 
 from django.views.decorators.http import require_GET, require_POST 
 
@@ -47,18 +47,34 @@ def exam_view(request, pk):
                     is_correct=False, 
                 )
 
-        # Xử lý câu hỏi đúng sai
+        # # Xử lý câu hỏi đúng sai
+        # for q in exam.questiontruefalse_set.all():
+        #     selected_answer = request.POST.get(f'question_tf_{q.id}')
+        #     is_correct = selected_answer == q.answer  # So sánh đáp án người dùng chọn với đáp án đúng
+        #     ResultTrueFalse.objects.create(
+        #         result=result,
+        #         question=q,
+        #         answer=selected_answer,
+        #         is_correct=is_correct
+        #     )
+        #     if is_correct:
+        #         score += 10  # Điểm cho câu hỏi đúng sai
+
+
+        # Xử lý câu hỏi đúng sai với các mệnh đề
         for q in exam.questiontruefalse_set.all():
-            selected_answer = request.POST.get(f'question_tf_{q.id}')
-            is_correct = selected_answer == q.answer  # So sánh đáp án người dùng chọn với đáp án đúng
-            ResultTrueFalse.objects.create(
-                result=result,
-                question=q,
-                answer=selected_answer,
-                is_correct=is_correct
-            )
-            if is_correct:
-                score += 10  # Điểm cho câu hỏi đúng sai
+            for a in q.answertruefalse_set.all():
+                user_answer = request.POST.get(f'question_tf_{q.id}_{a.id}')
+                if user_answer:
+                    is_correct = (user_answer == a.answer)  # Kiểm tra đáp án người dùng với đáp án đúng của câu trả lời
+                    ResultTrueFalse.objects.create(
+                        result=result,
+                        question=q,
+                        answer=user_answer,
+                        is_correct=is_correct
+                    )
+                    if is_correct:
+                        score += 10  # Cộng điểm nếu đáp án đúng
 
         
         # Xử lý câu hỏi điền đáp án

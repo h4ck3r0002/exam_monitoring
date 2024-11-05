@@ -28,9 +28,15 @@ class QuestionInline(nested_admin.NestedTabularInline):
     inlines = [AnswerInline]
 
 
+class AnswerTrueFalseInline(nested_admin.NestedTabularInline):
+    model = AnswerTrueFalse
+    extra = 4
+
+
 class QuestionTrueFalseInline(nested_admin.NestedTabularInline):
     model = QuestionTrueFalse 
-    extra = 5 
+    extra = 5
+    inlines = [AnswerTrueFalseInline]
 
 
 class QuestionFillInline(nested_admin.NestedTabularInline):

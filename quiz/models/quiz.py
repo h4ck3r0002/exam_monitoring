@@ -81,15 +81,9 @@ class Answer(CommonAbstract):
 
 
 class QuestionTrueFalse(CommonAbstract):
-    TF = (
-        ('true', 'true'),
-        ('false', 'false'),
-    )
-
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE, verbose_name='Bài kiểm tra', null=True)
     question_text = models.CharField(max_length=255, verbose_name='Câu hỏi', default='')
-    answer = models.CharField(max_length=7, default='true', choices=TF, verbose_name='Đáp án')
 
     
     class Meta:
@@ -100,7 +94,19 @@ class QuestionTrueFalse(CommonAbstract):
 
     
     def __str__(self):
-        return f"{self.id} - {self.question_text} - {self.answer}"
+        return f"{self.id} - {self.question_text}"
+
+
+class AnswerTrueFalse(CommonAbstract):
+    TF = (
+        ('true', 'true'),
+        ('false', 'false'),
+    )
+
+    id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    question = models.ForeignKey(QuestionTrueFalse, on_delete=models.SET_NULL, null=True, verbose_name='Câu hỏi')
+    clause = models.CharField(max_length=255, default='', verbose_name='Mệnh đề')
+    answer = models.CharField(max_length=7, default='true', choices=TF, verbose_name='Đáp án')
 
 
 class QuestionFill(CommonAbstract):

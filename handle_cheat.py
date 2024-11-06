@@ -69,9 +69,9 @@ def process_video(monitor_id):
         print(label, prob)
 
         # Nếu phát hiện gian lận
-        if label == "cheat":
+        if label == "cheat" and float(prob) > 0.8:
             is_cheat = True
-            reason = f"Cheating detected with probability {prob:.2f}"
+            reason = f"Phát hiện gian lận (Lý do: Không có người xuất hiện trong khung hình hoặc có nhiều hơn 1 nguời trong khung hình)"
             break
 
         

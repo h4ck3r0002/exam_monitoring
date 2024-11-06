@@ -11,41 +11,72 @@ from skimage.feature import hog
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'exam_monitoring.settings')
 django.setup()
 
-from quiz.models.quiz import Monitor, Result
+from quiz.models.quiz import Monitor, Result 
+from modules.SCRFD import SCRFD
 
 
-# Tải mô hình, scaler và label encoder
-model = joblib.load('cheat_detection_model.pkl')
-scaler = joblib.load('scaler.pkl')
-label_encoder = joblib.load('label_encoder.pkl')
-pca = joblib.load('pca.pkl')  # Tải PCA
+def visualize(image, boxes, lmarks, scores, fps=0):
+    for i in range(len(boxes)):
+        print(boxes[i])
+        xmin, ymin, xmax, ymax, score = boxes[i].astype("int")
+        cv2.rectangle(image, (xmin, ymin), (xmax, ymax), (0, 0, 255), thickness=2)
+        for j in range(5):
+            cv2.circle(
+                image,
+                (int(lmarks[i, j, 0]), int(lmarks[i, j, 1])),
+                1,
+                (0, 255, 0),
+                thickness=-1,
+            )
+    return image
 
-def extract_hog_features(image):
-    # Đảm bảo ảnh có kích thước 64x64
-    image = cv2.resize(image, (64, 64))  # Điều chỉnh kích thước ảnh
-    features, _ = hog(image, orientations=9, pixels_per_cell=(8, 8), cells_per_block=(2, 2),
-                      block_norm='L2-Hys', visualize=True)
-    return features
 
-def predict_image(frame):
-    gray_image = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    hog_features = extract_hog_features(gray_image)
+def are_coordinates_in_frame(frame, box, pts):
 
-    hog_features = hog_features.reshape(1, -1)  # Reshape cho mô hình dự đoán
-    hog_features = scaler.transform(hog_features)  # Chuẩn hóa dữ liệu
-    hog_features = pca.transform(hog_features)  # Giảm chiều dữ liệu
+    height, width = frame.shape[:2]
 
-    # Dự đoán
-    prediction = model.predict(hog_features)
-    probabilities = model.decision_function(hog_features)  # Lấy giá trị quyết định
-    probabilities = 1 / (1 + np.exp(-probabilities))  # Chuyển đổi thành xác suất
+    if np.any(box <= 0) or np.any(box >= height) or np.any(box >= width):
+        return False
+    if np.any(pts <= 0) or np.any(pts >= height) or np.any(pts >= width):
+        return False
 
-    # Đảm bảo chỉ có "cheat" hoặc "normal"
-    label = label_encoder.inverse_transform(prediction)[0]
-    if label not in ["cheat", "normal"]:
-        label = "unknown"  # Trường hợp bất ngờ, gán là "unknown"
+    return True
 
-    return label, probabilities[0]
+
+def find_pose(points):
+    LMx = points[:, 0]  # points[0:5]# horizontal coordinates of landmarks
+    LMy = points[:, 1]  # [5:10]# vertical coordinates of landmarks
+
+    dPx_eyes = max((LMx[1] - LMx[0]), 1)
+    dPy_eyes = LMy[1] - LMy[0]
+    angle = np.arctan(dPy_eyes / dPx_eyes)  # angle for rotation based on slope
+
+    alpha = np.cos(angle)
+    beta = np.sin(angle)
+
+    # rotated landmarks
+    LMxr = alpha * LMx + beta * LMy + (1 - alpha) * LMx[2] / 2 - beta * LMy[2] / 2
+    LMyr = -beta * LMx + alpha * LMy + beta * LMx[2] / 2 + (1 - alpha) * LMy[2] / 2
+
+    # average distance between eyes and mouth
+    dXtot = (LMxr[1] - LMxr[0] + LMxr[4] - LMxr[3]) / 2
+    dYtot = (LMyr[3] - LMyr[0] + LMyr[4] - LMyr[1]) / 2
+
+    # average distance between nose and eyes
+    dXnose = (LMxr[1] - LMxr[2] + LMxr[4] - LMxr[2]) / 2
+    dYnose = (LMyr[3] - LMyr[2] + LMyr[4] - LMyr[2]) / 2
+
+    # relative rotation 0 degree is frontal 90 degree is profile
+    Xfrontal = (-90 + 90 / 0.5 * dXnose / dXtot) if dXtot != 0 else 0
+    Yfrontal = (-90 + 90 / 0.5 * dYnose / dYtot) if dYtot != 0 else 0
+
+    return angle * 180 / np.pi, Xfrontal, Yfrontal
+
+
+onnxmodel = "scrfd_500m_kps.onnx"
+confThreshold = 0.5
+nmsThreshold = 0.5
+mynet = SCRFD(onnxmodel)
 
 
 def process_video(monitor_id):
@@ -59,21 +90,96 @@ def process_video(monitor_id):
     camera = cv2.VideoCapture(video_path)
     is_cheat = False
 
+    count_fraud = 0
+    frame_count = 0
+    start_time = time.time()
+    tm = cv2.TickMeter()
     while camera.isOpened():
         ret, frame = camera.read()
         if not ret:
             break
+        frame = cv2.flip(frame, 1)
+        tm.start()  # for calculating FPS
+        bboxes, lmarks, scores = mynet.detect(frame)  # face detection
+        tm.stop()
+        if len(scores)>1:
+            count_fraud+=1
+        else:
+            if bboxes.shape[0] > 0 or lmarks.shape[0] > 0:
 
-        # Dự đoán với từng khung hình
-        label, prob = predict_image(frame)
-        print(label, prob)
+                frame = visualize(frame, bboxes, lmarks, scores, fps=tm.getFPS())
 
-        # Nếu phát hiện gian lận
-        if label == "cheat" and float(prob) > 0.8:
-            is_cheat = True
-            reason = f"Phát hiện gian lận (Lý do: Không có người xuất hiện trong khung hình hoặc có nhiều hơn 1 nguời trong khung hình)"
-            break
+                # Check if all coordinates of the highest score face in the frame
+                position = "normal"
+                roll, yaw, pitch = find_pose(lmarks[0])
+                if yaw > 40:
+                    position = "trai"
+                    # threading.Thread(target=play_audio, args=("amthanh/trai.mp3",)).start()
+                    count_fraud += 1
+                elif yaw < -40:
+                    position = "phai"
+                    # threading.Thread(target=play_audio, args=("amthanh/phai.mp3",)).start()
+                    count_fraud += 1
+                if pitch > 25:
+                    position = "tren"
+                    # threading.Thread(target=play_audio, args=("amthanh/tren.mp3",)).start()
+                    count_fraud += 1
+                lmarks = lmarks.astype(int)
+                start_point = (lmarks[0][2][0], lmarks[0][2][1])
+                end_point = (lmarks[0][2][0] - int(yaw), lmarks[0][2][1] - int(pitch))
 
+                cv2.arrowedLine(frame, start_point, end_point, (255, 0, 0), 2)
+                bn = "\n"
+                cv2.putText(
+                    frame,
+                    f"{position}",
+                    (20, 60),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    1,
+                    (0, 255, 0),
+                    thickness=1,
+                )
+            else:
+                # threading.Thread(
+                #     target=play_audio, args=("amthanh/khongphathienkhuonmat.mp3",)
+                # ).start()
+                cv2.putText(
+                    frame,
+                    f"khong phat hien khuon mat",
+                    (20, 60),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    1,
+                    (0, 255, 0),
+                    thickness=1,
+                )
+                count_fraud += 1
+        # Tính toán FPS
+        frame_count += 1
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+
+        if elapsed_time > 0:
+            fps = frame_count / elapsed_time
+        else:
+            fps = 0
+
+        # Làm tròn FPS về số nguyên
+        fps_int = int(round(fps))
+
+        # Vẽ FPS lên khung hình
+        cv2.putText(
+            frame,
+            f"FPS: {fps_int}",
+            (10, 30),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            1,
+            (0, 255, 0),
+            2,
+            cv2.LINE_AA,
+        )
+
+    if count_fraud > 10:
+        is_cheat = True
         
     camera.release()
 

@@ -66,6 +66,7 @@ def process_video(monitor_id):
 
         # Dự đoán với từng khung hình
         label, prob = predict_image(frame)
+        print(label, prob)
 
         # Nếu phát hiện gian lận
         if label == "cheat":

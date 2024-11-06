@@ -4,15 +4,49 @@ import os
 import django
 import numpy as np
 from django.conf import settings
-from collections import deque
+from collections import deque 
+import joblib 
+from skimage.feature import hog
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'exam_monitoring.settings')
 django.setup()
 
 from quiz.models.quiz import Monitor, Result
 
-# Cài đặt bộ phát hiện khuôn mặt của OpenCV
-face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+
+# Tải mô hình, scaler và label encoder
+model = joblib.load('cheat_detection_model.pkl')
+scaler = joblib.load('scaler.pkl')
+label_encoder = joblib.load('label_encoder.pkl')
+pca = joblib.load('pca.pkl')  # Tải PCA
+
+def extract_hog_features(image):
+    # Đảm bảo ảnh có kích thước 64x64
+    image = cv2.resize(image, (64, 64))  # Điều chỉnh kích thước ảnh
+    features, _ = hog(image, orientations=9, pixels_per_cell=(8, 8), cells_per_block=(2, 2),
+                      block_norm='L2-Hys', visualize=True)
+    return features
+
+def predict_image(frame):
+    gray_image = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    hog_features = extract_hog_features(gray_image)
+
+    hog_features = hog_features.reshape(1, -1)  # Reshape cho mô hình dự đoán
+    hog_features = scaler.transform(hog_features)  # Chuẩn hóa dữ liệu
+    hog_features = pca.transform(hog_features)  # Giảm chiều dữ liệu
+
+    # Dự đoán
+    prediction = model.predict(hog_features)
+    probabilities = model.decision_function(hog_features)  # Lấy giá trị quyết định
+    probabilities = 1 / (1 + np.exp(-probabilities))  # Chuyển đổi thành xác suất
+
+    # Đảm bảo chỉ có "cheat" hoặc "normal"
+    label = label_encoder.inverse_transform(prediction)[0]
+    if label not in ["cheat", "normal"]:
+        label = "unknown"  # Trường hợp bất ngờ, gán là "unknown"
+
+    return label, probabilities[0]
+
 
 def process_video(monitor_id):
     reason = ''
@@ -24,49 +58,22 @@ def process_video(monitor_id):
     # Mở video
     camera = cv2.VideoCapture(video_path)
     is_cheat = False
-    face_turn_count = 0
-    max_face_turns = 3  # Ngưỡng quay đầu
-    head_positions = deque(maxlen=5)  # Lưu các vị trí đầu gần nhất
 
     while camera.isOpened():
         ret, frame = camera.read()
         if not ret:
             break
 
-        # Chuyển ảnh sang xám để phát hiện khuôn mặt
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+        # Dự đoán với từng khung hình
+        label, prob = predict_image(frame)
 
-        # Kiểm tra nếu không có người trong camera
-        if len(faces) == 0:
-            print("Không có người xuất hiện trong camera.")
-            reason = 'Không có người xuất hiện trong camera.'
+        # Nếu phát hiện gian lận
+        if label == "cheat":
             is_cheat = True
+            reason = f"Cheating detected with probability {prob:.2f}"
             break
-        elif len(faces) > 1:
-            print("Phát hiện nhiều hơn 1 người trong camera.")
-            is_cheat = True
-            reason = 'Phát hiện nhiều hơn 1 người trong camera.'
-            break
-        else:
-            # Theo dõi vị trí đầu
-            for (x, y, w, h) in faces:
-                face_center = (x + w // 2, y + h // 2)
-                head_positions.append(face_center)
 
-                # Kiểm tra quay đầu trái/phải
-                if len(head_positions) == 5:
-                    left_right_movements = [head_positions[i][0] - head_positions[i - 1][0] for i in range(1, 5)]
-                    if all(movement > 0 for movement in left_right_movements) or all(movement < 0 for movement in left_right_movements):
-                        face_turn_count += 1
-                        head_positions.clear()
-
-                    if face_turn_count > max_face_turns:
-                        print("Phát hiện quay đầu nhiều lần.")
-                        is_cheat = True
-                        reason = 'Phát hiện quay đầu nhiều lần. (trên 3)'
-                        break
-
+        
     camera.release()
 
     # Cập nhật trạng thái gian lận trong cơ sở dữ liệu

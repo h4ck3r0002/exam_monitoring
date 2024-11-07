@@ -5,6 +5,7 @@ import django
 import numpy as np
 from django.conf import settings
 from collections import deque 
+import time
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'exam_monitoring.settings')
 django.setup()

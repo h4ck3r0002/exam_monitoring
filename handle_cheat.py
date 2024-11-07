@@ -1,8 +1,17 @@
+import cv2
+import sys
+import os
+import django
+import numpy as np
+from django.conf import settings
+from collections import deque
+import threading
 import django
 import numpy as np
 from django.conf import settings
 from collections import deque 
 import joblib 
+import os 
 # from skimage.feature import hog
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'exam_monitoring.settings')

@@ -92,6 +92,7 @@ mynet = SCRFD(onnxmodel)
 count_face = 0
 count_fraud = 0
 def process_video(monitor_id):
+    global count_face, count_fraud
     reason = ""
 
     # Lấy đối tượng Monitor

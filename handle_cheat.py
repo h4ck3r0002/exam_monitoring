@@ -89,7 +89,8 @@ confThreshold = 0.5
 nmsThreshold = 0.5
 mynet = SCRFD(onnxmodel)
 
-
+count_face = 0
+count_fraud = 0
 def process_video(monitor_id):
     reason = ""
 
@@ -100,8 +101,7 @@ def process_video(monitor_id):
     # Mở video
     camera = cv2.VideoCapture(video_path)
     is_cheat = False
-    count_face = 0
-    count_fraud = 0
+
     frame_count = 0
     start_time = time.time()
     tm = cv2.TickMeter()
@@ -144,9 +144,9 @@ def process_video(monitor_id):
             cv2.LINE_AA,
         )
 
-    if count_fraud > 10:
+    if count_fraud > 50:
         is_cheat = True
-    if count_face>30:
+    if count_face>10:
         is_cheat= True
     camera.release()
 

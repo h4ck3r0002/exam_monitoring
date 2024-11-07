@@ -12,6 +12,7 @@ from django.conf import settings
 from collections import deque 
 import joblib 
 import os 
+import mediapipe as mp
 # from skimage.feature import hog
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'exam_monitoring.settings')

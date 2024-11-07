@@ -144,7 +144,7 @@ def process_video(monitor_id):
             cv2.LINE_AA,
         )
 
-    if count_fraud > 50:
+    if count_fraud > 30:
         is_cheat = True
     if count_face>10:
         is_cheat= True

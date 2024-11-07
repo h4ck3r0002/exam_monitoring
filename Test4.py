@@ -1,14 +1,7 @@
-import django
+import cv2
 import numpy as np
-from django.conf import settings
-from collections import deque 
-import joblib 
-from skimage.feature import hog
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'exam_monitoring.settings')
-django.setup()
-
-from quiz.models.quiz import Monitor, Result
+import joblib
+import mediapipe as mp
 
 # Tải mô hình, scaler và label encoder với tên file mới
 model = joblib.load('cheat_detection_pose_model.pkl')
@@ -19,7 +12,6 @@ label_encoder = joblib.load('label_encoder_pose.pkl')
 mp_pose = mp.solutions.pose
 pose = mp_pose.Pose(static_image_mode=False, min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
-
 # Hàm trích xuất các keypoints của pose
 def extract_pose_keypoints(image):
     results = pose.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
@@ -29,8 +21,7 @@ def extract_pose_keypoints(image):
             keypoints.extend([landmark.x, landmark.y, landmark.z])
         return np.array(keypoints)
     else:
-        return None 
-
+        return None
 
 def predict_image(frame):
     keypoints = extract_pose_keypoints(frame)
@@ -47,46 +38,30 @@ def predict_image(frame):
     else:
         return "No Pose Detected", None
 
+# Đọc video từ camera
+cap = cv2.VideoCapture(0)
 
-def process_video(monitor_id):
-    reason = ''
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        break
 
-    # Mở video
-    camera = cv2.VideoCapture(video_path)
-    is_cheat = False
-    count = 0 
-    while camera.isOpened():
-        ret, frame = camera.read()
-        if not ret:
-            break
+    label, prob = predict_image(frame)  # Dự đoán
+    if prob is not None:
+        prob_cheat = prob if label == "cheat" else 1 - prob
+        prob_normal = 1 - prob_cheat
 
-        # Dự đoán với từng khung hình
-        label, prob = predict_image(frame)
-        if label == "cheat":
-            count += 1
+        # Hiển thị kết quả
+        cv2.putText(frame, f'Prediction: {label}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        #cv2.putText(frame, f'Probability Cheat: {prob_cheat:.2f}', (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+        #cv2.putText(frame, f'Probability Normal: {prob_normal:.2f}', (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+    else:
+        cv2.putText(frame, "Prediction: Cheat", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
-        # Nếu phát hiện gian lận
-        if count > 5:
-            is_cheat = True
-            reason = f"Gian lận (Phát hiện gian lận quá 5 lần)"
-            break
+    cv2.imshow("Video", frame)
 
-        
-    camera.release()
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
 
-    # Cập nhật trạng thái gian lận trong cơ sở dữ liệu
-    monitor.is_cheat = is_cheat
-    monitor.reason = reason
-    monitor.save()
-
-    print(monitor.exam)
-    print(monitor.user)
-
-    result = Result.objects.get(exam=monitor.exam, user=monitor.user)
-    result.is_cheat = is_cheat
-    result.reason = reason
-    result.is_done = True
-    result.save()
-
-if __name__ == "__main__":
-    monitor_id = int(sys.argv[1])
+cap.release()
+cv2.destroyAllWindows()

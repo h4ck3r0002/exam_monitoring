@@ -4,52 +4,95 @@ import os
 import django
 import numpy as np
 from django.conf import settings
-from collections import deque 
-import joblib 
-from skimage.feature import hog
+from collections import deque
+import threading
+import pygame
+import time
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'exam_monitoring.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "exam_monitoring.settings")
 django.setup()
 
 from quiz.models.quiz import Monitor, Result
 
 
-# Tải mô hình, scaler và label encoder
-model = joblib.load('cheat_detection_model.pkl')
-scaler = joblib.load('scaler.pkl')
-label_encoder = joblib.load('label_encoder.pkl')
-pca = joblib.load('pca.pkl')  # Tải PCA
-
-def extract_hog_features(image):
-    # Đảm bảo ảnh có kích thước 64x64
-    image = cv2.resize(image, (64, 64))  # Điều chỉnh kích thước ảnh
-    features, _ = hog(image, orientations=9, pixels_per_cell=(8, 8), cells_per_block=(2, 2),
-                      block_norm='L2-Hys', visualize=True)
-    return features
-
-def predict_image(frame):
-    gray_image = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    hog_features = extract_hog_features(gray_image)
-
-    hog_features = hog_features.reshape(1, -1)  # Reshape cho mô hình dự đoán
-    hog_features = scaler.transform(hog_features)  # Chuẩn hóa dữ liệu
-    hog_features = pca.transform(hog_features)  # Giảm chiều dữ liệu
-
-    # Dự đoán
-    prediction = model.predict(hog_features)
-    probabilities = model.decision_function(hog_features)  # Lấy giá trị quyết định
-    probabilities = 1 / (1 + np.exp(-probabilities))  # Chuyển đổi thành xác suất
-
-    # Đảm bảo chỉ có "cheat" hoặc "normal"
-    label = label_encoder.inverse_transform(prediction)[0]
-    if label not in ["cheat", "normal"]:
-        label = "unknown"  # Trường hợp bất ngờ, gán là "unknown"
-
-    return label, probabilities[0]
+import cv2
+import numpy as np
+from modules.SCRFD import SCRFD
 
 
+def play_audio(path):
+    pygame.mixer.music.load(path)
+    pygame.mixer.music.play()
+    pygame.time.set_timer(pygame.USEREVENT, 3000)
+
+
+def visualize(image, boxes, lmarks, scores, fps=0):
+    for i in range(len(boxes)):
+        print(boxes[i])
+        xmin, ymin, xmax, ymax, score = boxes[i].astype("int")
+        cv2.rectangle(image, (xmin, ymin), (xmax, ymax), (0, 0, 255), thickness=2)
+        for j in range(5):
+            cv2.circle(
+                image,
+                (int(lmarks[i, j, 0]), int(lmarks[i, j, 1])),
+                1,
+                (0, 255, 0),
+                thickness=-1,
+            )
+    return image
+
+
+def are_coordinates_in_frame(frame, box, pts):
+
+    height, width = frame.shape[:2]
+
+    if np.any(box <= 0) or np.any(box >= height) or np.any(box >= width):
+        return False
+    if np.any(pts <= 0) or np.any(pts >= height) or np.any(pts >= width):
+        return False
+
+    return True
+
+
+def find_pose(points):
+    LMx = points[:, 0]  # points[0:5]# horizontal coordinates of landmarks
+    LMy = points[:, 1]  # [5:10]# vertical coordinates of landmarks
+
+    dPx_eyes = max((LMx[1] - LMx[0]), 1)
+    dPy_eyes = LMy[1] - LMy[0]
+    angle = np.arctan(dPy_eyes / dPx_eyes)  # angle for rotation based on slope
+
+    alpha = np.cos(angle)
+    beta = np.sin(angle)
+
+    # rotated landmarks
+    LMxr = alpha * LMx + beta * LMy + (1 - alpha) * LMx[2] / 2 - beta * LMy[2] / 2
+    LMyr = -beta * LMx + alpha * LMy + beta * LMx[2] / 2 + (1 - alpha) * LMy[2] / 2
+
+    # average distance between eyes and mouth
+    dXtot = (LMxr[1] - LMxr[0] + LMxr[4] - LMxr[3]) / 2
+    dYtot = (LMyr[3] - LMyr[0] + LMyr[4] - LMyr[1]) / 2
+
+    # average distance between nose and eyes
+    dXnose = (LMxr[1] - LMxr[2] + LMxr[4] - LMxr[2]) / 2
+    dYnose = (LMyr[3] - LMyr[2] + LMyr[4] - LMyr[2]) / 2
+
+    # relative rotation 0 degree is frontal 90 degree is profile
+    Xfrontal = (-90 + 90 / 0.5 * dXnose / dXtot) if dXtot != 0 else 0
+    Yfrontal = (-90 + 90 / 0.5 * dYnose / dYtot) if dYtot != 0 else 0
+
+    return angle * 180 / np.pi, Xfrontal, Yfrontal
+
+
+onnxmodel = "models/scrfd_500m_kps.onnx"
+confThreshold = 0.5
+nmsThreshold = 0.5
+mynet = SCRFD(onnxmodel)
+
+count_face = 0
+count_fraud = 0
 def process_video(monitor_id):
-    reason = ''
+    reason = ""
 
     # Lấy đối tượng Monitor
     monitor = Monitor.objects.get(id=monitor_id)
@@ -59,22 +102,52 @@ def process_video(monitor_id):
     camera = cv2.VideoCapture(video_path)
     is_cheat = False
 
+    frame_count = 0
+    start_time = time.time()
+    tm = cv2.TickMeter()
     while camera.isOpened():
         ret, frame = camera.read()
         if not ret:
             break
+        frame = cv2.flip(frame, 1)
+        tm.start()  # for calculating FPS
+        bboxes, lmarks, scores = mynet.detect(frame)  # face detection
+        tm.stop()
+        if len(scores)>1:
+            count_face+=1
+        else:
+            count_fraud += 1
+        # Tính toán FPS
+        frame_count += 1
+        end_time = time.time()
+        elapsed_time = end_time - start_time
 
-        # Dự đoán với từng khung hình
-        label, prob = predict_image(frame)
-        print(label, prob)
+        if elapsed_time > 0:
+            fps = frame_count / elapsed_time
+        else:
+            fps = 0
 
-        # Nếu phát hiện gian lận
-        if label == "cheat" and float(prob) > 0.8:
-            is_cheat = True
-            reason = f"Phát hiện gian lận (Lý do: Không có người xuất hiện trong khung hình hoặc có nhiều hơn 1 nguời trong khung hình)"
-            break
+        # Làm tròn FPS về số nguyên
+        fps_int = int(round(fps))
+        
 
         
+        # Vẽ FPS lên khung hình
+        cv2.putText(
+            frame,
+            f"FPS: {fps_int}",
+            (10, 30),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            1,
+            (0, 255, 0),
+            2,
+            cv2.LINE_AA,
+        )
+
+    if count_fraud > 50:
+        is_cheat = True
+    if count_face>10:
+        is_cheat= True
     camera.release()
 
     # Cập nhật trạng thái gian lận trong cơ sở dữ liệu
@@ -90,6 +163,7 @@ def process_video(monitor_id):
     result.reason = reason
     result.is_done = True
     result.save()
+
 
 if __name__ == "__main__":
     monitor_id = int(sys.argv[1])

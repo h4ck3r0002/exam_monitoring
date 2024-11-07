@@ -4,14 +4,26 @@ import os
 import django
 import numpy as np
 from django.conf import settings
-from collections import deque 
+from collections import deque
+import threading
+import pygame
 import time
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'exam_monitoring.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "exam_monitoring.settings")
 django.setup()
 
-from quiz.models.quiz import Monitor, Result 
+from quiz.models.quiz import Monitor, Result
+
+
+import cv2
+import numpy as np
 from modules.SCRFD import SCRFD
+
+
+def play_audio(path):
+    pygame.mixer.music.load(path)
+    pygame.mixer.music.play()
+    pygame.time.set_timer(pygame.USEREVENT, 3000)
 
 
 def visualize(image, boxes, lmarks, scores, fps=0):
@@ -72,14 +84,14 @@ def find_pose(points):
     return angle * 180 / np.pi, Xfrontal, Yfrontal
 
 
-onnxmodel = "scrfd_500m_kps.onnx"
+onnxmodel = "models/scrfd_500m_kps.onnx"
 confThreshold = 0.5
 nmsThreshold = 0.5
 mynet = SCRFD(onnxmodel)
 
 
 def process_video(monitor_id):
-    reason = ''
+    reason = ""
 
     # Lấy đối tượng Monitor
     monitor = Monitor.objects.get(id=monitor_id)
@@ -88,7 +100,7 @@ def process_video(monitor_id):
     # Mở video
     camera = cv2.VideoCapture(video_path)
     is_cheat = False
-
+    count_face = 0
     count_fraud = 0
     frame_count = 0
     start_time = time.time()
@@ -102,56 +114,9 @@ def process_video(monitor_id):
         bboxes, lmarks, scores = mynet.detect(frame)  # face detection
         tm.stop()
         if len(scores)>1:
-            count_fraud+=1
+            count_face+=1
         else:
-            if bboxes.shape[0] > 0 or lmarks.shape[0] > 0:
-
-                frame = visualize(frame, bboxes, lmarks, scores, fps=tm.getFPS())
-
-                # Check if all coordinates of the highest score face in the frame
-                position = "normal"
-                roll, yaw, pitch = find_pose(lmarks[0])
-                if yaw > 40:
-                    position = "trai"
-                    # threading.Thread(target=play_audio, args=("amthanh/trai.mp3",)).start()
-                    count_fraud += 1
-                elif yaw < -40:
-                    position = "phai"
-                    # threading.Thread(target=play_audio, args=("amthanh/phai.mp3",)).start()
-                    count_fraud += 1
-                if pitch > 25:
-                    position = "tren"
-                    # threading.Thread(target=play_audio, args=("amthanh/tren.mp3",)).start()
-                    count_fraud += 1
-                lmarks = lmarks.astype(int)
-                start_point = (lmarks[0][2][0], lmarks[0][2][1])
-                end_point = (lmarks[0][2][0] - int(yaw), lmarks[0][2][1] - int(pitch))
-
-                cv2.arrowedLine(frame, start_point, end_point, (255, 0, 0), 2)
-                bn = "\n"
-                cv2.putText(
-                    frame,
-                    f"{position}",
-                    (20, 60),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    1,
-                    (0, 255, 0),
-                    thickness=1,
-                )
-            else:
-                # threading.Thread(
-                #     target=play_audio, args=("amthanh/khongphathienkhuonmat.mp3",)
-                # ).start()
-                cv2.putText(
-                    frame,
-                    f"khong phat hien khuon mat",
-                    (20, 60),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    1,
-                    (0, 255, 0),
-                    thickness=1,
-                )
-                count_fraud += 1
+            count_fraud += 1
         # Tính toán FPS
         frame_count += 1
         end_time = time.time()
@@ -164,7 +129,9 @@ def process_video(monitor_id):
 
         # Làm tròn FPS về số nguyên
         fps_int = int(round(fps))
+        
 
+        
         # Vẽ FPS lên khung hình
         cv2.putText(
             frame,
@@ -179,7 +146,8 @@ def process_video(monitor_id):
 
     if count_fraud > 10:
         is_cheat = True
-        
+    if count_face>30:
+        is_cheat= True
     camera.release()
 
     # Cập nhật trạng thái gian lận trong cơ sở dữ liệu
@@ -195,6 +163,7 @@ def process_video(monitor_id):
     result.reason = reason
     result.is_done = True
     result.save()
+
 
 if __name__ == "__main__":
     monitor_id = int(sys.argv[1])

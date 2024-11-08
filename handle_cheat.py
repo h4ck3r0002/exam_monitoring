@@ -91,8 +91,12 @@ mynet = SCRFD(onnxmodel)
 
 count_face = 0
 count_fraud = 0
+is_cheat = False
 def process_video(monitor_id):
     reason = ""
+    global count_face
+    global count_fraud
+    global is_cheat
 
     # Lấy đối tượng Monitor
     monitor = Monitor.objects.get(id=monitor_id)
@@ -114,9 +118,9 @@ def process_video(monitor_id):
         bboxes, lmarks, scores = mynet.detect(frame)  # face detection
         tm.stop()
         
-        if len(scores)>1:
+        if len(bboxes)>1:
             count_face+=1
-        elif len(scores)==0:
+        elif len(bboxes)==0:
             count_fraud += 1
         # Tính toán FPS
         frame_count += 1
@@ -145,9 +149,9 @@ def process_video(monitor_id):
             cv2.LINE_AA,
         )
 
-    if count_fraud > 60:
+    if count_fraud > 50:
         is_cheat = True
-    if count_face>1:
+    if count_face>10:
         is_cheat= True
     camera.release()
 

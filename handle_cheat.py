@@ -113,9 +113,10 @@ def process_video(monitor_id):
         tm.start()  # for calculating FPS
         bboxes, lmarks, scores = mynet.detect(frame)  # face detection
         tm.stop()
+        
         if len(scores)>1:
             count_face+=1
-        else:
+        elif len(scores)==0:
             count_fraud += 1
         # Tính toán FPS
         frame_count += 1

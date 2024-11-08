@@ -144,9 +144,9 @@ def process_video(monitor_id):
             cv2.LINE_AA,
         )
 
-    if count_fraud > 30:
+    if count_fraud > 60:
         is_cheat = True
-    if count_face>10:
+    if count_face>1:
         is_cheat= True
     camera.release()
 

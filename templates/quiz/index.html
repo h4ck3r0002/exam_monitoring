@@ -34,27 +34,29 @@
     </div>
 </nav>
 
-<div class="container p-3 row" style="margin: 0 auto;">
-  {% for exam in exams %}
-    <a class="card mb-3 col-5 nav-link p-3" style="margin-right: 24px;" href="{% url 'exam' exam.id %}">
-      <div class="">
-        <div class="row g-0">
-          <div class="col-md-4">
-            <img src="{% static 'assets/images/laboratory.png' %}" class="img-fluid rounded-start" alt="{{exam.title}}">
-          </div>
-          <div class="col-md-8">
-            <div class="card-body">
-              <h5 class="card-title">{{exam.title}}</h5>
-              <p class="card-text">{{exam.title}} - 15 câu hỏi (có đáp án)</p>
-              <p class="card-text">Thời gian thi: {{exam.time_todo}} phút</p>
-              <p class="card-text">Người tạo: {{exam.created_by}}</p>
-              <p class="card-text"><small class="text-body-secondary">Ngày tạo: {{exam.created_at|date:"d/m/Y"}}</small></p>
+<div class="container p-3">
+  <div class="row">
+    {% for exam in exams %}
+      <div class="col-12 col-sm-6 col-lg-4 mb-3">
+        <a class="card nav-link h-100" href="{% url 'exam' exam.id %}">
+          <div class="row g-0">
+            <div class="col-4">
+              <img src="{% static 'assets/images/laboratory.png' %}" class="img-fluid rounded-start" alt="{{exam.title}}">
+            </div>
+            <div class="col-8">
+              <div class="card-body">
+                <h5 class="card-title">{{exam.title}}</h5>
+                <p class="card-text">{{exam.title}} - 15 câu hỏi (có đáp án)</p>
+                <p class="card-text">Thời gian thi: {{exam.time_todo}} phút</p>
+                <p class="card-text">Người tạo: {{exam.created_by}}</p>
+                <p class="card-text"><small class="text-body-secondary">Ngày tạo: {{exam.created_at|date:"d/m/Y"}}</small></p>
+              </div>
             </div>
           </div>
-        </div>
+        </a>
       </div>
-    </a>
-  {% endfor %}
+    {% endfor %}
+  </div>
 </div>
 
 <style>
@@ -100,6 +102,14 @@
     color: #28A745; /* Màu xanh lá cây cho nút Đăng nhập/Đăng xuất */
     border-color: #28A745;
   }
+
+  @media (max-width: 576px) {
+    .card {
+      border-width: 2px;
+      font-size: 14px;
+    }
+  }
+
 </style>
 
 {% endblock content %}

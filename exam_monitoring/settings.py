@@ -28,13 +28,13 @@ DEBUG = True
 
 # ALLOWED_HOSTS = []
 
-ALLOWED_HOSTS = ['https://web-production-4f5a7.up.railway.app/', 'web-production-4f5a7.up.railway.app', 'https://thitructuyenai.online/', 'thitructuyenai.online', 'https://exammonitoring-production.up.railway.app', 'exammonitoring-production.up.railway.app']
+ALLOWED_HOSTS = ['thitructuyenai.online', 'exammonitoring-production.up.railway.app']
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-CSRF_TRUSTED_ORIGINS = ['https://web-production-4f5a7.up.railway.app/', 'https://thitructuyenai.online/', 'https://exammonitoring-production.up.railway.app']
+CSRF_TRUSTED_ORIGINS = ['https://thitructuyenai.online/', 'https://exammonitoring-production.up.railway.app']
 
 # Cors settings 
 CORS_ALLOW_ALL_ORIGINS = True 

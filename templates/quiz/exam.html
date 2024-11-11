@@ -35,10 +35,11 @@
                     </div>
                 {% endfor %}
 
-                <!-- Phần câu hỏi đúng sai -->
-                <h3 style="color: #333;font-size: 20px;margin-top: 12px;" class="mb-3">Phần II. Câu hỏi đúng sai</h3>
+                
                 {% for question in exam.questiontruefalse_set.all %}
                     <div class="slide">
+                        <!-- Phần câu hỏi đúng sai -->
+                        <h3 style="color: #333;font-size: 20px;margin-top: 12px;" class="mb-3">Phần II. Câu hỏi đúng sai</h3>
                         <p style="color: #FF6B6B; font-size: 18px; font-weight: bold; background-color: #FFF3E0; padding: 12px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
                             Câu hỏi: {{ question.question_text }}
                         </p>

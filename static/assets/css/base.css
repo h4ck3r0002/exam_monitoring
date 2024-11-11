@@ -58,3 +58,36 @@
 ul {
     list-style: none;
 }
+
+
+/* Responsive styles for smaller screens */
+@media (max-width: 768px) {
+    .slider {
+        height: 60vh; /* Increase height for smaller screens */
+    }
+
+    .slide {
+        padding: 16px; /* Reduce padding */
+    }
+
+    .controls button {
+        padding: 8px 16px; /* Smaller buttons */
+        font-size: 14px; /* Smaller font size */
+        margin: 5px; /* Less margin between buttons */
+    }
+}
+
+@media (max-width: 576px) {
+    .slider {
+        height: auto; /* Further increase height for very small screens */
+    }
+
+    .slide {
+        padding: 12px; /* Further reduce padding */
+    }
+
+    .controls button {
+        padding: 6px 12px; /* Even smaller buttons */
+        font-size: 12px; /* Even smaller font size */
+    }
+}

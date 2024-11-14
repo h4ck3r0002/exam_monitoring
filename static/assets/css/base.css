@@ -19,14 +19,15 @@
 
 .slider {
     display: flex;
-    overflow: hidden;
+    /* overflow: hidden; */
+    overflow-y: scroll;
     width: 100%;
     /* border: 1px solid #ccc; */
     border: none;
     border-radius: 6px;
     margin: 20px 0;
     position: relative;
-    height: 50vh;
+    height: 60vh;
 }
 
 .slide {

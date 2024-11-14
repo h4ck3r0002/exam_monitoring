@@ -109,7 +109,7 @@
     .moving-object {
         position: absolute;
         top: 10px; /* Đặt vị trí gần đáy hoặc điều chỉnh theo ý muốn */
-        left: 0;
+        left: 20px;
         width: 100px;
         height: 100px;
         background: url("{% static 'assets/images/animal.avif' %}") no-repeat center/contain; /* Đổi 'animal.png' thành hình ảnh con vật bạn muốn */
@@ -124,7 +124,7 @@
         transform: translateY(0);
         }
         50% {
-        transform: translateY(calc(100vh - 100px)); /* Di chuyển từ trái sang phải, trừ đi chiều rộng của hình để giữ trong màn hình */
+        transform: translateY(calc(100vh - 200px)); /* Di chuyển từ trái sang phải, trừ đi chiều rộng của hình để giữ trong màn hình */
         }
         100% {
         transform: translateY(0);

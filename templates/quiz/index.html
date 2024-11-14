@@ -6,14 +6,14 @@
 
 <nav class="navbar navbar-expand-lg bg-dark border-bottom border-body" data-bs-theme="dark">
     <div class="container">
-      <a class="navbar-brand" href="#">Cuongcon</a>
+      <a class="navbar-brand" href="/">Cuongcon</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Trang chủ</a>
+            <a class="nav-link active" aria-current="page" href="/">Trang chủ</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">Giới thiệu</a>
@@ -45,9 +45,9 @@
             </div>
             <div class="col-8">
               <div class="card-body">
-                <h5 class="card-title">{{exam.title}}</h5>
-                <p class="card-text">{{exam.title}} - 15 câu hỏi (có đáp án)</p>
-                <p class="card-text">Thời gian thi: {{exam.time_todo}} phút</p>
+                <h5 style="color: #0D92F4;" class="card-title">{{exam.title}}</h5>
+                <p class="card-text">{{exam.title}} (có đáp án)</p>
+                <p class="card-text" style="color: #F95454;">Thời gian thi: {{exam.time_todo}} phút</p>
                 <p class="card-text">Người tạo: {{exam.created_by}}</p>
                 <p class="card-text"><small class="text-body-secondary">Ngày tạo: {{exam.created_at|date:"d/m/Y"}}</small></p>
               </div>
@@ -62,11 +62,6 @@
 <style>
   body {
     height: 100vh;
-    /* background-color: #f8f8f8;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-image: url("{% static 'assets/images/bg5.jpg' %}"); */
     background-image: linear-gradient(135deg, #0d6efd, #ffffff);
   }
 
@@ -101,6 +96,16 @@
   .btn-outline-success {
     color: #28A745; /* Màu xanh lá cây cho nút Đăng nhập/Đăng xuất */
     border-color: #28A745;
+  }
+
+  .card img {
+    border-radius: 15px 0 0 15px; /* Làm tròn góc hình ảnh bên trái */
+    transition: transform 0.3s ease;
+  }
+
+
+  .card:hover img {
+      transform: scale(1.05); /* Phóng to nhẹ khi hover */
   }
 
   @media (max-width: 576px) {

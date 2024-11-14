@@ -4,28 +4,28 @@
 
 {% block content %}
 
-<div class="container p-3">
+<div class="container p-3" style="background-color: #0D92F4;height: 100vh;">
     <div class="">
         <input type="hidden" name="exam_id" id="exam_id" value="{{exam.id}}">
-        <h2 style="color: #FFBF61;font-size: 28px;">{{ exam.title }}</h2>
-        <p>Số lượng câu hỏi: {{counter}}</p>
+        <h2 style="color: #0D92F4;font-size: 28px;box-shadow: 0 10px 15px 6px rgba(0, 0, 0, 0.1);background-color: #54da5f;padding: 12px 24px;border-radius: 4px;"><span><i style="font-size: 20px;color: #fff;margin-right: 12px;" class="fa-solid fa-list-check"></i></span> {{ exam.title }}</h2>
+        <p>Số lượng câu hỏi: {{counter}} <span><i style="font-size: 20px;color: #0e4f7e;margin-left: 12px;" class="fa-regular fa-circle-question"></i></span></p>
         <p style="display: flex;align-items: center;justify-content: space-between;"><span style="color: #222;font-weight: 700;font-size: 18px;">Player: {{request.user.username}}</span></p>
-        <p style="display: flex;align-items: center;justify-content: space-between;"><span id="countdown" style="display: block;font-size: 18px;font-weight: 700;color: #0D92F4;">15:00</span></p>
+        <p style="display: flex;align-items: center;justify-content: space-between;"><span id="countdown" style="display: block;font-size: 18px;font-weight: 700;color: #C62E2E;">15:00</span></p>
         <form method="post" action="{% url 'exam' exam.id %}">
             {% csrf_token %}
             <div class="slider">
                 {% for question in exam.question_set.all %}
                     <div class="slide">
-                        <h3 style="color: #333;font-size: 20px;margin-top: 12px;" class="mb-3">Phần I. Câu hỏi trắc nghiệm (4 đáp án)</h3>
+                        <h3 style="font-size: 20px;margin-top: 12px;color: #0D92F4;" class="mb-3">Phần I. Câu hỏi trắc nghiệm (4 đáp án)</h3>
 
                         <p style="color: #FF6B6B; font-size: 18px; font-weight: bold; background-color: #FFF3E0; padding: 12px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-                            Câu hỏi: {{ question.question_text }}
+                            <span><i style="color: #0D92F4;font-size: 20px;margin-right: 12px;" class="fa-regular fa-circle-question"></i></span> Câu hỏi: {{ question.question_text }}
                         </p>
                         
 
                         <input type="hidden" name="question_{{ question.id }}" value="">
                         {% for answer in question.answer_set.all %}
-                            <div class="form-check mb-3">
+                            <div class="form-check mb-3" style="box-shadow: 0 10px 15px 6px rgba(0, 0, 0, 0.1);padding: 12px 12px 12px 40px;border-radius: 4px;cursor: pointer;background-color: #fff;">
                                 <input class="form-check-input" type="radio" name="question_{{ question.id }}" value="{{ answer.id }}">
                                 <label class="form-check-label">
                                     {{ answer.answer_text }}
@@ -39,20 +39,22 @@
                 {% for question in exam.questiontruefalse_set.all %}
                     <div class="slide">
                         <!-- Phần câu hỏi đúng sai -->
-                        <h3 style="color: #333;font-size: 20px;margin-top: 12px;" class="mb-3">Phần II. Câu hỏi đúng sai</h3>
+                        <h3 style="color: #0D92F4;font-size: 20px;margin-top: 12px;" class="mb-3">Phần II. Câu hỏi đúng sai</h3>
                         <p style="color: #FF6B6B; font-size: 18px; font-weight: bold; background-color: #FFF3E0; padding: 12px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-                            Câu hỏi: {{ question.question_text }}
+                            <span><i style="color: #0D92F4;font-size: 20px;margin-right: 12px;" class="fa-regular fa-circle-question"></i></span> Câu hỏi: {{ question.question_text }}
                         </p>
                         {% for answer in question.answertruefalse_set.all %}
-                        <div class="form-check mb-3 d-flex align-items-center justify-content-start" style="gap: 24px;">
-                            <label class="form-check-label me-3">{{ answer.clause }}</label>
-                            <div>
-                                <input class="form-check-input me-2" type="radio" name="question_tf_{{ question.id }}_{{ answer.id }}" value="true">
-                                <label class="form-check-label me-3">Đúng</label>
-                            </div>
-                            <div>
-                                <input class="form-check-input me-2" type="radio" name="question_tf_{{ question.id }}_{{ answer.id }}" value="false">
-                                <label class="form-check-label">Sai</label>
+                        <div class="form-check mb-3 d-flex align-items-center justify-content-between" style="gap: 24px;box-shadow: 0 10px 15px 6px rgba(0, 0, 0, 0.1);padding: 12px 12px 12px 40px;border-radius: 4px;cursor: pointer;background-color: #fff;">
+                            <label class="form-check-label me-3" style="flex: 1;">{{ answer.clause }}</label>
+                            <div style="width: max-content;gap: 24px;" class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <input class="form-check-input me-2" type="radio" name="question_tf_{{ question.id }}_{{ answer.id }}" value="true">
+                                    <label class="form-check-label me-3">Đúng</label>
+                                </div>
+                                <div>
+                                    <input class="form-check-input me-2" type="radio" name="question_tf_{{ question.id }}_{{ answer.id }}" value="false">
+                                    <label class="form-check-label">Sai</label>
+                                </div>
                             </div>
                         </div>
                         {% endfor %}
@@ -62,16 +64,16 @@
                 <!-- Câu hỏi điền đáp án -->
                 {% for question in exam.questionfill_set.all %}
                     <div class="slide">
-                        <h3 style="color: #333;font-size: 20px;margin-top: 12px;" class="mb-3">Phần III. Câu hỏi điền đáp án</h3>
+                        <h3 style="color: #0D92F4;font-size: 20px;margin-top: 12px;" class="mb-3">Phần III. Câu hỏi điền đáp án</h3>
                         
                         <p style="color: #FF6B6B; font-size: 18px; font-weight: bold; background-color: #FFF3E0; padding: 12px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-                            Câu hỏi: {{ question.question_text }}
+                            <span><i style="color: #0D92F4;font-size: 20px;margin-right: 12px;" class="fa-regular fa-circle-question"></i></span> Câu hỏi: {{ question.question_text }}
                         </p>
                         
 
                         <input type="hidden" name="question_fill_{{ question.id }}" value="">
                         <div class="mb-3">
-                            <label class="form-label">Điền vào đáp án</label>
+                            <label class="form-label" style="color: #0D92F4;">Điền vào đáp án</label>
                             <input class="form-control" type="text" name="question_fill_{{ question.id }}">
                         </div>
                     </div>
@@ -80,13 +82,15 @@
             
             <div class="controls">
                 <button type="button" class="btn btn-dark" onclick="prevSlide()">
+                    <span><i style="font-size: 20px;margin-right: 12px;" class="fa-solid fa-caret-left"></i></span>
                     Prev
                 </button>
                 <button type="button" class="btn btn-primary" onclick="nextSlide()">
                     Next
+                    <span><i style="font-size: 20px;margin-left: 12px;" class="fa-solid fa-caret-right"></i></span>
                 </button>
-                <button class="btn btn-success" type="submit">Nộp bài</button>
-                <button type="button" onclick="window.location.href = '/'" class="btn btn-dark">Trang chủ</button>
+                <button class="btn btn-success" type="submit"><span><i style="font-size: 20px;margin-right: 12px;" class="fa-solid fa-paper-plane"></i></span> Nộp bài</button>
+                <button type="button" onclick="window.location.href = '/'" class="btn btn-dark"><span><i style="font-size: 20px;margin-right: 12px;" class="fa-solid fa-house"></i></span> Trang chủ</button>
             </div>
         </form>
     </div>
@@ -97,6 +101,39 @@
     <div style="position: fixed; top: 20px; right: 20px; width: 150px; height: 150px; border: 3px solid #0D92F4; border-radius: 10px; overflow: hidden;">
         <video id="videoElement" autoplay muted style="width: 100%; height: 100%; object-fit: cover;"></video>
     </div>
+
+    <div class="moving-object"></div>
+
+    <style>
+    /* Định dạng ban đầu của phần tử hoạt hình */
+    .moving-object {
+        position: absolute;
+        bottom: 10px; /* Đặt vị trí gần đáy hoặc điều chỉnh theo ý muốn */
+        left: 0;
+        width: 100px;
+        height: 100px;
+        background: url("{% static 'assets/images/animal.avif' %}") no-repeat center/contain; /* Đổi 'animal.png' thành hình ảnh con vật bạn muốn */
+        animation: moveAnimal 10s linear infinite;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    /* Hoạt ảnh di chuyển */
+    @keyframes moveAnimal {
+        0% {
+        transform: translateX(0);
+        }
+        50% {
+        transform: translateX(calc(100vw - 100px)); /* Di chuyển từ trái sang phải, trừ đi chiều rộng của hình để giữ trong màn hình */
+        }
+        100% {
+        transform: translateX(0);
+        }
+    }
+    </style>
+
+    
+      
 
     <script>
         // Countdown timer (15 minutes)
@@ -179,7 +216,12 @@
 
     <style>
         body {
-            background: linear-gradient(135deg, #E0F7FA, #FFEBEE);
+            /* background: linear-gradient(135deg, #E0F7FA, #FFEBEE); */
+            background-image: url("{% static 'assets/images/quiz_background.jpg' %}");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            position: relative;
         }
 
         /* Responsive adjustments */

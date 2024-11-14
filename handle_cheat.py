@@ -1,22 +1,16 @@
 import cv2
+import numpy as np
 import sys
 import os
 import django
-import numpy as np
 from django.conf import settings
-from collections import deque
-import threading
-import pygame
-import time
+
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "exam_monitoring.settings")
 django.setup()
 
 from quiz.models.quiz import Monitor, Result
 
-
-import cv2
-import numpy as np
 
 
 # Load model và cấu trúc mạng

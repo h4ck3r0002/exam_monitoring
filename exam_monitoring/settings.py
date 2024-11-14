@@ -26,15 +26,15 @@ SECRET_KEY = 'django-insecure-61+u#_no#60r^j7mt$x$q$$o-3&s5b67plu+w5u=4u$j53!d56
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = []
 
-ALLOWED_HOSTS = ['thitructuyenai.online', 'exammonitoring-production.up.railway.app']
+# ALLOWED_HOSTS = ['thitructuyenai.online', 'exammonitoring-production.up.railway.app']
 
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# CSRF_COOKIE_SECURE = True
+# SESSION_COOKIE_SECURE = True
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-CSRF_TRUSTED_ORIGINS = ['https://thitructuyenai.online/', 'https://exammonitoring-production.up.railway.app']
+# CSRF_TRUSTED_ORIGINS = ['https://thitructuyenai.online/', 'https://exammonitoring-production.up.railway.app']
 
 # Cors settings 
 CORS_ALLOW_ALL_ORIGINS = True 
@@ -88,23 +88,23 @@ WSGI_APPLICATION = 'exam_monitoring.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'HOST': 'autorack.proxy.rlwy.net',
-        'PORT': '18517',
-        'NAME': 'railway',
-        'USER': 'postgres',
-        'PASSWORD': 'kVIpbEVpQqofMhCXvIAQbBfvKGjAyInD',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'HOST': 'autorack.proxy.rlwy.net',
+#         'PORT': '18517',
+#         'NAME': 'railway',
+#         'USER': 'postgres',
+#         'PASSWORD': 'kVIpbEVpQqofMhCXvIAQbBfvKGjAyInD',
+#     }
+# }
 
 
 # Password validation

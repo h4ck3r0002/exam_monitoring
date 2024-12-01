@@ -154,72 +154,88 @@ STATICFILES_DIRS = [
 
 CKEDITOR_UPLOAD_PATH = "uploads/" 
 
+# CKEditor UI and plugins configuration
 CKEDITOR_CONFIGS = {
     'default': {
-        'skin': 'moono',
-        # 'skin': 'office2013',
-        'toolbar_Basic': [
-            ['Source', '-', 'Bold', 'Italic']
+        # Toolbar configuration
+        # name - Toolbar name
+        # items - The buttons enabled in the toolbar
+        'toolbar_DefaultToolbarConfig': [
+            {
+                'name': 'basicstyles',
+                'items': ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript',
+                          'Superscript', ],
+            },
+            {
+                'name': 'clipboard',
+                'items': ['Undo', 'Redo', ],
+            },
+            {
+                'name': 'paragraph',
+                'items': ['NumberedList', 'BulletedList', 'Outdent', 'Indent',
+                          'HorizontalRule', 'JustifyLeft', 'JustifyCenter',
+                          'JustifyRight', 'JustifyBlock', ],
+            },
+            {
+                'name': 'format',
+                'items': ['Format', ],
+            },
+            {
+                'name': 'extra',
+                'items': ['Link', 'Unlink', 'Blockquote', 'Image', 'Table',
+                          'CodeSnippet', 'Mathjax', 'Embed', ],
+            },
+            {
+                'name': 'source',
+                'items': ['Maximize', 'Source', ],
+            },
         ],
-        'toolbar_YourCustomToolbarConfig': [
-            {'name': 'document', 'items': ['Source', '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates']},
-            {'name': 'clipboard', 'items': ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo']},
-            {'name': 'editing', 'items': ['Find', 'Replace', '-', 'SelectAll']},
-            {'name': 'forms',
-             'items': ['Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton',
-                       'HiddenField']},
-            '/',
-            {'name': 'basicstyles',
-             'items': ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat']},
-            {'name': 'paragraph',
-             'items': ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-',
-                       'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl',
-                       'Language']},
-            {'name': 'links', 'items': ['Link', 'Unlink', 'Anchor']},
-            {'name': 'insert',
-             'items': ['Image', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe']},
-            '/',
-            {'name': 'styles', 'items': ['Styles', 'Format', 'Font', 'FontSize']},
-            {'name': 'colors', 'items': ['TextColor', 'BGColor']},
-            {'name': 'tools', 'items': ['Maximize', 'ShowBlocks']},
-            {'name': 'about', 'items': ['About']},
-            '/',  # put this to force next toolbar on new line
-            {'name': 'yourcustomtools', 'items': [
-                # put the name of your editor.ui.addButton here
-                'Preview',
-                'Maximize',
 
-            ]},
-        ],
-        'toolbar': 'YourCustomToolbarConfig',  # put selected toolbar config here
-        'toolbarGroups': [{ 'name': 'document', 'groups': [ 'mode', 'document', 'doctools' ] }],
-        'height': 291,
-        'width': '100%',
-        'filebrowserWindowHeight': 725,
-        'filebrowserWindowWidth': 940,
-        'toolbarCanCollapse': True,
-        'mathJaxLib': '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
+        # This hides the default title provided by CKEditor
+        'title': False,
+
+        # Use this toolbar
+        'toolbar': 'DefaultToolbarConfig',
+
+        # Which tags to allow in format tab
+        'format_tags': 'p;h1;h2',
+
+        # Remove these dialog tabs (semicolon separated dialog:tab)
+        'removeDialogTabs': ';'.join([
+            'image:advanced',
+            'image:Link',
+            'link:upload',
+            'table:advanced',
+            'tableProperties:advanced',
+        ]),
+        'linkShowTargetTab': False,
+        'linkShowAdvancedTab': False,
+
+        # CKEditor height and width settings
+        'height': '250px',
+        'width': 'auto',
+        'forcePasteAsPlainText ': True,
+
+        # Class used inside span to render mathematical formulae using latex
+        'mathJaxClass': 'mathjax-latex',
+
+        # Mathjax library link to be used to render mathematical formulae
+        'mathJaxLib': 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_SVG',
+
+        # Tab = 4 spaces inside the editor
         'tabSpaces': 4,
+
+        # Extra plugins to be used in the editor
         'extraPlugins': ','.join([
-            'uploadimage', # the upload image feature
-            'mathjax',
-            # your extra plugins here
-            'div',
-            'autolink',
-            'autoembed',
-            'embedsemantic',
-            'autogrow',
-            # 'devtools',
-            'widget',
-            'lineutils',
-            'clipboard',
-            'dialog',
-            'dialogui',
-            'elementspath'
+            # 'devtools',  # Shows a tooltip in dialog boxes for developers
+            'mathjax',  # Used to render mathematical formulae
+            'codesnippet',  # Used to add code snippets
+            'image2',  # Loads new and better image dialog
+            'embed',  # Used for embedding media (YouTube/Slideshare etc)
+            'tableresize',  # Used to allow resizing of columns in tables
         ]),
     }
 }
-
 
 
 JAZZMIN_SETTINGS = {

@@ -6,7 +6,7 @@
 
 <nav class="navbar navbar-expand-lg bg-dark border-bottom border-body" data-bs-theme="dark">
     <div class="container">
-      <a class="navbar-brand" href="/">Cuongcon</a>
+      <!-- <a class="navbar-brand" href="/">Cuongcon</a> -->
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -48,6 +48,7 @@
                 <h5 style="color: #0D92F4;" class="card-title">{{exam.title}}</h5>
                 <p class="card-text">{{exam.title}} (có đáp án)</p>
                 <p class="card-text" style="color: #F95454;">Thời gian thi: {{exam.time_todo}} phút</p>
+                <p class="card-text">Số lượt thi: {{exam.retry}}</p>
                 <p class="card-text">Người tạo: {{exam.created_by}}</p>
                 <p class="card-text"><small class="text-body-secondary">Ngày tạo: {{exam.created_at|date:"d/m/Y"}}</small></p>
               </div>

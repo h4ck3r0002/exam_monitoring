@@ -5,6 +5,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save 
 import os 
 import subprocess 
+from ckeditor_uploader.fields import RichTextUploadingField
 
 
 class CommonAbstract(models.Model):
@@ -32,6 +33,7 @@ class Exam(CommonAbstract):
     time_todo = models.IntegerField(default=15, verbose_name='Thời gian làm bài (phút)')
     room_code = models.CharField(max_length=15, unique=True, verbose_name='Mã phòng thi')
     created_by = models.CharField(max_length=255, verbose_name='Người tạo')
+    retry = models.SmallIntegerField(default=1, verbose_name='Số lượt thi tối đa')
 
 
     class Meta:
@@ -48,7 +50,7 @@ class Exam(CommonAbstract):
 class Question(CommonAbstract):
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE, verbose_name='Bài kiểm tra')
-    question_text = models.CharField(max_length=255, verbose_name='Câu hỏi')
+    question_text = RichTextUploadingField(null=True, blank=True, verbose_name='Câu hỏi')
 
 
     class Meta:
@@ -65,7 +67,7 @@ class Question(CommonAbstract):
 class Answer(CommonAbstract):
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     question = models.ForeignKey(Question, on_delete=models.CASCADE, verbose_name='Câu hỏi')
-    answer_text = models.CharField(max_length=255, verbose_name='Câu trả lời')
+    answer_text = RichTextUploadingField(null=True, blank=True, verbose_name='Câu trả lời')
     is_correct = models.BooleanField(default=False, verbose_name='Câu trả lời đúng')
 
 
@@ -83,7 +85,7 @@ class Answer(CommonAbstract):
 class QuestionTrueFalse(CommonAbstract):
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE, verbose_name='Bài kiểm tra', null=True)
-    question_text = models.CharField(max_length=255, verbose_name='Câu hỏi', default='')
+    question_text = RichTextUploadingField(null=True, blank=True, verbose_name='Câu hỏi')
 
     
     class Meta:
@@ -105,15 +107,15 @@ class AnswerTrueFalse(CommonAbstract):
 
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     question = models.ForeignKey(QuestionTrueFalse, on_delete=models.SET_NULL, null=True, verbose_name='Câu hỏi')
-    clause = models.CharField(max_length=255, default='', verbose_name='Mệnh đề')
+    clause = RichTextUploadingField(null=True, blank=True, verbose_name='Mệnh đề')
     answer = models.CharField(max_length=7, default='true', choices=TF, verbose_name='Đáp án')
 
 
 class QuestionFill(CommonAbstract):
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE, verbose_name='Bài kiểm tra', null=True)
-    question_text = models.CharField(max_length=255, verbose_name='Câu hỏi', default='')
-    answer = models.CharField(max_length=255, verbose_name='Đáp án đúng', default='')
+    question_text = RichTextUploadingField(null=True, blank=True, verbose_name='Câu hỏi')
+    answer = RichTextUploadingField(null=True, blank=True, verbose_name='Đáp án đúng')
 
 
     class Meta:
@@ -185,7 +187,7 @@ class ResultFill(CommonAbstract):
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     result = models.ForeignKey(Result, on_delete=models.CASCADE, verbose_name='Bài kiểm tra', null=True)
     question = models.ForeignKey(QuestionFill, on_delete=models.SET_NULL, null=True, verbose_name='Câu hỏi')
-    answer = models.CharField(max_length=255, verbose_name='Câu trả lời', default='')
+    answer = RichTextUploadingField(null=True, blank=True, verbose_name='Câu trả lời')
     is_correct = models.BooleanField(default=False, verbose_name='Kết quả (Đ/S)')
 
 

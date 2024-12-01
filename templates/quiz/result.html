@@ -24,14 +24,14 @@
         {% for detail in result.resultdetail_set.all %}
             <li class="card mb-4 shadow-sm border-0">
                 <div class="card-body">
-                    <p class="card-title"><strong>Question:</strong> {{ detail.question.question_text }}</p>
+                    <p class="card-title"><strong>Question:</strong> {{ detail.question.question_text|safe }}</p>
                     <ul class="list-unstyled">
                         {% for answer in detail.question.answer_set.all %}
                             <li class="p-2 mb-2 rounded
                                 {% if answer == detail.answer and detail.is_correct %} bg-warning
                                 {% elif answer == detail.answer and not detail.is_correct %} bg-danger text-white
                                 {% endif %}">
-                                {{ answer.answer_text }}
+                                {{ answer.answer_text|safe }}
                                 {% if answer == detail.answer %}
                                     - <span class="fw-bold">Your Choice</span>
                                 {% endif %}
@@ -40,7 +40,7 @@
                     </ul>
                     <p><strong>Correct Answer:</strong> 
                         {% for answer in detail.question.answer_set.all %}
-                            {% if answer.is_correct %}<span class="text-success">{{ answer.answer_text }}</span>{% endif %}
+                            {% if answer.is_correct %}<span class="text-success">{{ answer.answer_text|safe }}</span>{% endif %}
                         {% endfor %}
                     </p>
                 </div>
@@ -78,13 +78,13 @@
         {% for detail in true_false_details %}
             <li class="card mb-4 shadow-sm border-0">
                 <div class="card-body">
-                    <p class="card-title"><strong>Question:</strong> {{ detail.question.question_text }}</p>
+                    <p class="card-title"><strong>Question:</strong> {{ detail.question.question_text|safe }}</p>
 
                     <!-- Lặp qua từng mệnh đề trong câu hỏi đúng sai -->
                     <ul class="list-unstyled">
                         {% for answer in detail.question.answertruefalse_set.all %}
                             <li class="d-flex align-items-center mb-2">
-                                <p class="me-3"><strong>Clause:</strong> {{ answer.clause }}</p>
+                                <p class="me-3"><strong>Clause:</strong> {{ answer.clause|safe }}</p>
                                 
                                 <!-- Hiển thị đáp án của người dùng -->
                                 <p class="me-3 {% if detail.answer == answer.answer and detail.is_correct %} text-success {% else %} text-danger {% endif %}">
@@ -113,7 +113,7 @@
         {% for detail in fill_details %}
             <li class="card mb-4 shadow-sm border-0">
                 <div class="card-body">
-                    <p class="card-title"><strong>Question:</strong> {{ detail.question.question_text }}</p>
+                    <p class="card-title"><strong>Question:</strong> {{ detail.question.question_text|safe }}</p>
                     <p class="{% if detail.answer == detail.question.answer and detail.is_correct %} text-success {% else %} text-danger {% endif %}">
                         <strong>Your Answer:</strong> 
                         {% if detail.answer %} 
@@ -123,7 +123,7 @@
                         {% endif %}
                     </p>
                     <p><strong>Correct Answer:</strong> 
-                        <span class="text-success">{{ detail.question.answer }}</span>
+                        <span class="text-success">{{ detail.question.answer|safe }}</span>
                     </p>
                 </div>
             </li>

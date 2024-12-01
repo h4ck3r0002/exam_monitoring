@@ -1,0 +1,5 @@
+Phần đề bài copy được công thức toán học (sử dụng django ckeditor) (Done)
+
+Xóa chữ cuongcon (Done)
+
+Số lần thi tự xử lý (Done)

@@ -76,7 +76,7 @@ def process_video(monitor_id):
     print(monitor.exam)
     print(monitor.user)
 
-    result = Result.objects.filter(exam=monitor.exam, user=monitor.user).first()
+    result = Result.objects.filter(exam=monitor.exam, user=monitor.user).order_by('-created_at').first()
     result.is_cheat = is_cheat
     result.reason = reason
     result.is_done = True

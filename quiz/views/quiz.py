@@ -64,6 +64,7 @@ def exam_view(request, pk):
 
         # Xử lý câu hỏi đúng sai với các mệnh đề
         for q in exam.questiontruefalse_set.all():
+            count_temp = 0
             for a in q.answertruefalse_set.all():
                 user_answer = request.POST.get(f'question_tf_{q.id}_{a.id}')
                 if user_answer:
@@ -75,7 +76,16 @@ def exam_view(request, pk):
                         is_correct=is_correct
                     )
                     if is_correct:
-                        score += 10  # Cộng điểm nếu đáp án đúng
+                        # score += 10  # Cộng điểm nếu đáp án đúng
+                        count_temp += 1 
+            if count_temp == 1:
+                score += 1
+            elif count_temp == 2:
+                score += 2.5 
+            elif count_temp == 3:
+                score += 5 
+            elif count_temp == 4: 
+                score += 10
 
         
         # Xử lý câu hỏi điền đáp án
